@@ -29,7 +29,7 @@ from tensorboard_logger import configure, log_value
 
 np.random.seed(1)
 torch.manual_seed(1)
-torch.cuda.manual_seed(1)
+torch.cuda.manual_seed_all(1)
 random.seed(1)
 
 DATASET_FOLDER = os.path.join("..", "dataset")
@@ -169,8 +169,6 @@ model = model.cuda()
 
 text_field.vocab.load_vectors('glove.6B.300d')
 model.word_embeddings.weight.data = text_field.vocab.vectors.cuda()
-model.word_embeddings.weight.requires_grad = False
-
 
 # In[9]:
 
