@@ -155,7 +155,6 @@ class FAQ(data.Dataset):
 
         train_examples, dev_examples = examples[:dev_length], examples[dev_length:]
 
-        print(dev_examples[:10])
         print('train:',len(train_examples),'dev:',len(dev_examples))
 
         return (cls(text_field, label_field, examples=train_examples),
@@ -170,6 +169,9 @@ def load_mr(text_field, label_field, batch_size, path, dev_ratio):
     print('loading data')
     train_data, dev_data = FAQ.splits(text_field, label_field, path, dev_ratio)
 
+    print("Train length: {}".format(len(train_data)))
+    print("Num batch: {}".format(len(train_data)/batch_size))
+
     text_field.build_vocab(train_data, dev_data)
     label_field.build_vocab(train_data, dev_data)
 
@@ -177,14 +179,8 @@ def load_mr(text_field, label_field, batch_size, path, dev_ratio):
 
     train_iter, dev_iter = data.Iterator.splits(
         (train_data, dev_data), batch_sizes=(batch_size, batch_size),
-        device = None
+        repeat=False, device = None
     )
     
     return train_iter, dev_iter
-
-
-
-
-
-
 

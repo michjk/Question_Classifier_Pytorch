@@ -100,8 +100,8 @@ def evaluate(model, eval_iter, loss_function,  name ='dev'):
         model.batch_size = len(label.data)
         model.hidden = model.init_hidden()  # detaching it from its history on the last instance.
         pred = model(sent)
-        pred_label = pred.data.max(1)[1].numpy()
-        pred_res += [x[0] for x in pred_label]
+        pred_label = pred.data.max(1)[1]
+        pred_res += [x for x in pred_label]
         loss = loss_function(pred, label)
         avg_loss += loss.data[0]
 
@@ -191,6 +191,7 @@ for i in range(EPOCH):
     if dev_acc > best_dev_acc:
         best_dev_acc = dev_acc
         os.system('rm best_models/mr_best_model_minibatch_acc_*.model')
+        os.system('mkdir best_models')
         print('New Best Dev!!!')
         torch.save(model.state_dict(), 'best_models/mr_best_model_minibatch_acc_' + str(int(dev_acc*10000)) + '.model')
         no_up = 0
