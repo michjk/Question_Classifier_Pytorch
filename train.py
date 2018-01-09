@@ -52,7 +52,7 @@ class QRNNClassifier(nn.Module):
         self.hidden_dim = hidden_dim
         self.batch_size = batch_size
         self.word_embeddings = nn.Embedding(vocab_size, embedding_dim, num_layers)
-        self.qrnn = nn.LSTM(embedding_dim, hidden_dim, dropout=dropout)
+        self.qrnn = QRNN(embedding_dim, hidden_dim, dropout=dropout)
         self.hidden_to_label = nn.Linear(hidden_dim, label_size)
         self.hidden = self.init_hidden()
     
