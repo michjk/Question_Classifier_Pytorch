@@ -167,7 +167,7 @@ best_dev_acc = 0.0
 model = QRNNClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, num_layers=LAYERS_NUM, dropout=DROPOUT)
 model = model.cuda()
 
-text_field.vocab.load_vectors(wv_type='glove.6B', wv_dim=EMBEDDING_DIM)
+text_field.vocab.load_vectors('glove.6B.300d')
 model.word_embeddings.weight.data = text_field.vocab.vectors
 
 

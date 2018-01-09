@@ -111,3 +111,6 @@ best_model/
 
 #vscode
 .vscode/
+
+#vector cache
+.vector_cache/
