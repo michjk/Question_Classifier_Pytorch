@@ -37,22 +37,22 @@ DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "list_of_questions_train_lab
 
 EMBEDDING_DIM = 128
 HIDDEN_DIM = 50
-LAYERS_NUM = 3
+LAYERS_NUM = 1
 EPOCH = 200
 BATCH_SIZE = 64
 DEV_RATIO = 0.1
-
+DROPOUT = 0.5
 
 # In[3]:
 
 
 class QRNNClassifier(nn.Module):
-    def __init__(self, embedding_dim, hidden_dim, vocab_size, label_size, batch_size, num_layers):
+    def __init__(self, embedding_dim, hidden_dim, vocab_size, label_size, batch_size, num_layers, dropout):
         super().__init__()
         self.hidden_dim = hidden_dim
         self.batch_size = batch_size
         self.word_embeddings = nn.Embedding(vocab_size, embedding_dim, num_layers)
-        self.qrnn = QRNN(embedding_dim, hidden_dim)
+        self.qrnn = QRNN(embedding_dim, hidden_dim, dropout=dropout)
         self.hidden_to_label = nn.Linear(hidden_dim, label_size)
         self.hidden = self.init_hidden()
     
@@ -167,7 +167,7 @@ train_iter, dev_iter = load_mr(text_field, label_field, batch_size=BATCH_SIZE, p
 
 best_dev_acc = 0.0
 
-model = QRNNClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, num_layers=LAYERS_NUM)
+model = QRNNClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, num_layers=LAYERS_NUM, dropout=DROPOUT)
 model = model.cuda()
 
 
