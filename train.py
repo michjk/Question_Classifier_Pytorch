@@ -37,9 +37,9 @@ DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "list_of_questions_train_lab
 
 EMBEDDING_DIM = 128
 HIDDEN_DIM = 50
-LAYERS_NUM = 1
+LAYERS_NUM = 3
 EPOCH = 200
-BATCH_SIZE = 16
+BATCH_SIZE = 64
 DEV_RATIO = 0.1
 DROPOUT = 0.5
 
