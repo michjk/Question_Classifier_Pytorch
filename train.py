@@ -35,13 +35,13 @@ random.seed(1)
 DATASET_FOLDER = os.path.join("..", "dataset")
 DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "list_of_questions_train_labeled.txt")
 
-EMBEDDING_DIM = 128
+EMBEDDING_DIM = 300
 HIDDEN_DIM = 50
 LAYERS_NUM = 1
 EPOCH = 200
 BATCH_SIZE = 64
 DEV_RATIO = 0.1
-DROPOUT = 0
+DROPOUT = 0.5
 
 # In[3]:
 
@@ -166,6 +166,9 @@ best_dev_acc = 0.0
 
 model = QRNNClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, num_layers=LAYERS_NUM, dropout=DROPOUT)
 model = model.cuda()
+
+text_field.vocab.load_vectors(wv_type='glove.6B', wv_dim=EMBEDDING_DIM)
+model.word_embeddings.weight.data = text_field.vocab.vectors
 
 
 # In[9]:
