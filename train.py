@@ -168,7 +168,7 @@ model = QRNNClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab
 model = model.cuda()
 
 text_field.vocab.load_vectors('glove.6B.300d')
-model.word_embeddings.weight.data = text_field.vocab.vectors
+model.word_embeddings.weight.data = text_field.vocab.vectors.cuda()
 
 
 # In[9]:
