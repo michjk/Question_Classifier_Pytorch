@@ -45,7 +45,7 @@ def load_data_and_labels_highest_freq_clustered(test, num_of_top):
     questions = list(open(test, "r").readlines())
     x_text = [" ".join(s.split()[1:]) for s in questions]
     labels = [s.split()[0] for s in questions]
-    x_text = [clean_str(s) for s in x_text]
+    #x_text = [clean_str(s) for s in x_text]
     
     freq = Counter(labels)
     freq = freq.most_common(num_of_top)
@@ -53,16 +53,12 @@ def load_data_and_labels_highest_freq_clustered(test, num_of_top):
     highest_labels = [label for label, _ in freq]
 
     set_highest_labels = set(highest_labels)
-    
-    label_vectors = make_label_vector([event, period, person, place])
 
     y = []
     x = []
 
     print("Initial length ", len(x_text))
     len_questions = len(x_text)
-    
-    count_new_label = []
 
     for i in range(len_questions):
         label = labels[i]
@@ -72,30 +68,19 @@ def load_data_and_labels_highest_freq_clustered(test, num_of_top):
             x.append(text)
             tmp = []
             if label in label_event:
-                tmp = label_vectors[event]
-                count_new_label.append(event)
+                tmp = event
             if label in label_period:
-                tmp = label_vectors[period]
-                count_new_label.append(period)
+                tmp = period
             if label in label_person:
-                tmp = label_vectors[person]
-                count_new_label.append(person)
+                tmp = person
             if label in label_place:
-                tmp = label_vectors[place]
-                count_new_label.append(place)
+                tmp = place
             
             y.append(tmp)
     
     print("Lenght after ", len(x), len(y))
 
-    count_new_label = Counter(count_new_label)
-
-    print(count_new_label)
-
-    y = np.concatenate([y], 0)
-
-    print("After concatenate ", len(y))
-    return [x, y]
+    return x, y
 
 def make_label_vector(list_labels):
     label_vectors = dict()
@@ -132,15 +117,20 @@ class FAQ(data.Dataset):
         if examples is None:
             path = self.dirname if path is None else path
             examples = []
-            questions = []
-            with codecs.open(path,'r','utf8') as f:
+            questions, labels = load_data_and_labels_highest_freq_clustered(path, 20)
+            len_questions = len(questions)
+
+            for i in range(len_questions):
+                examples.append(data.Example.fromlist([questions[i], labels[i]], fields))
+            
+            ''' with codecs.open(path,'r','utf8') as f:
                 for line in f:
                     tmp = line.split()
                     x = " ".join(tmp[1:])
                     #x = clean_str(x)
                     y = tmp[0]
                     questions.append(x)
-                    examples.append(data.Example.fromlist([x, y], fields))
+                    examples.append(data.Example.fromlist([x, y], fields)) '''
         
         super().__init__(examples, fields, **kwargs)
     
@@ -169,14 +159,10 @@ def load_mr(text_field, label_field, batch_size, path, dev_ratio):
     print('loading data')
     train_data, dev_data = FAQ.splits(text_field, label_field, path, dev_ratio)
 
-    print("Train length: {}".format(len(train_data)))
-    print("Num batch: {}".format(len(train_data)/batch_size))
-
     text_field.build_vocab(train_data, dev_data)
     label_field.build_vocab(train_data, dev_data)
 
     print('building batches')
-
     train_iter, dev_iter = data.Iterator.splits(
         (train_data, dev_data), batch_sizes=(batch_size, batch_size),
         repeat=False, device = None
