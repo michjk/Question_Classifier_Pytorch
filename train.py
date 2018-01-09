@@ -37,7 +37,7 @@ DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "list_of_questions_train_lab
 
 EMBEDDING_DIM = 128
 HIDDEN_DIM = 50
-LAYERS_NUM = 3
+LAYERS_NUM = 1
 EPOCH = 200
 BATCH_SIZE = 64
 DEV_RATIO = 0.1
@@ -52,7 +52,7 @@ class QRNNClassifier(nn.Module):
         self.hidden_dim = hidden_dim
         self.batch_size = batch_size
         self.word_embeddings = nn.Embedding(vocab_size, embedding_dim, num_layers)
-        self.qrnn = QRNN(embedding_dim, hidden_dim, dropout=dropout)
+        self.qrnn = nn.LSTM(embedding_dim, hidden_dim, dropout=dropout)
         self.hidden_to_label = nn.Linear(hidden_dim, label_size)
         self.hidden = self.init_hidden()
     
@@ -130,9 +130,6 @@ def train_epoch(model, train_iter, loss_function, optimizer, text_field, label_f
         model.hidden = model.init_hidden()# detaching it from its history on the last instance.
         pred = model(sent)
         pred_label = pred.data.max(1)[1]
-        #print(pred_label)
-        #print(len(pred_label))
-        #print(label)
         pred_res += [x for x in pred_label]
         model.zero_grad()
         loss = loss_function(pred, label)
