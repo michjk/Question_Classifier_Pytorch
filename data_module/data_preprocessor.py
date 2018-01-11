@@ -45,7 +45,7 @@ def load_data_and_labels_highest_freq_clustered(test, num_of_top):
     questions = list(open(test, "r").readlines())
     x_text = [" ".join(s.split()[1:]) for s in questions]
     labels = [s.split()[0] for s in questions]
-    #x_text = [clean_str(s) for s in x_text]
+    x_text = [clean_str(s) for s in x_text]
     
     freq = Counter(labels)
     freq = freq.most_common(num_of_top)

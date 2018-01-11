@@ -17,6 +17,8 @@ import torch.optim as optim
 import torchqrnn.forget_mult
 from torchqrnn import QRNN
 
+import torchwordemb
+
 from data_module.data_preprocessor import *
 
 import os
@@ -35,7 +37,7 @@ random.seed(1)
 DATASET_FOLDER = os.path.join("..", "dataset")
 DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "list_of_questions_train_labeled.txt")
 
-EMBEDDING_DIM = 128
+EMBEDDING_DIM = 300
 HIDDEN_DIM = 50
 LAYERS_NUM = 1
 EPOCH = 200
@@ -57,6 +59,9 @@ class QRNNClassifier(nn.Module):
         self.hidden = self.init_hidden()
     
     def init_hidden(self):
+        """
+        Initialize weight of hidden
+        """
         # the first is the hidden h
         # the second is the cell  c
         return (autograd.Variable(torch.zeros(1, self.batch_size, self.hidden_dim).cuda()),
@@ -167,15 +172,18 @@ best_dev_acc = 0.0
 model = QRNNClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, num_layers=LAYERS_NUM, dropout=DROPOUT)
 model = model.cuda()
 
-#text_field.vocab.load_vectors('glove.6B.300d')
-#model.word_embeddings.weight.data = text_field.vocab.vectors.cuda()
+#vocab, vec = torchwordemb.load_word2vec_bin("../dataset/GoogleNews-vectors-negative300.bin")
+#text_field.vocab.set_vectors(vocab, vec, EMBEDDING_DIM)
+text_field.vocab.load_vectors('glove.6B.300d')
+model.word_embeddings.weight.data = text_field.vocab.vectors.cuda()
+#model.word_embeddings.weight.requires_grad = False
 
 # In[9]:
 
 
 loss_function = nn.NLLLoss()
 update_parameter = filter(lambda p: p.requires_grad, model.parameters())
-optimizer = optim.Adam(model.parameters(), lr = 1e-3)
+optimizer = optim.Adam(update_parameter, lr = 1e-3)
 
 
 # In[10]:
@@ -195,10 +203,10 @@ for i in range(EPOCH):
         print('New Best Dev!!!')
         torch.save(model.state_dict(), 'best_models/mr_best_model_minibatch_acc_' + str(int(dev_acc*10000)) + '.model')
         no_up = 0
-    ''' 
-    else:
+    
+    ''' else:
         no_up += 1
         if no_up >= 10:
-            exit()
-    '''
+            exit() '''
+
 
