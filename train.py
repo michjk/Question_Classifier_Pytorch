@@ -43,7 +43,7 @@ LAYERS_NUM = 1
 EPOCH = 200
 BATCH_SIZE = 64
 DEV_RATIO = 0.1
-DROPOUT = 0.7
+DROPOUT = 0.2
 
 # In[3]:
 
@@ -188,7 +188,7 @@ optimizer = optim.Adam(update_parameter, lr = 1e-3)
 
 # In[10]:
 
-configure("runs/run_1", flush_secs=2)
+configure("runs/run_2", flush_secs=2)
 
 no_up = 0
 for i in range(EPOCH):
