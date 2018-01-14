@@ -34,7 +34,7 @@ random.seed(1)
 EMBEDDING_DIM = 300
 HIDDEN_DIM = 256
 LAYERS_NUM = 1
-EPOCH = 50
+EPOCH = 20
 BATCH_SIZE = 24
 DROPOUT = 0.3
 ZONEOUT = 0
@@ -116,6 +116,8 @@ def evaluate(model, eval_iter, loss_function,  name ='dev'):
 
 
 def train_epoch(model, train_iter, loss_function, optimizer, text_field, label_field, i):
+    if isinstance(model, QRNNClassifier):
+        model.reset()
     model.train()
     avg_loss = 0.0
     count = 0
