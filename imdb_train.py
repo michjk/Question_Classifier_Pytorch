@@ -38,6 +38,8 @@ EPOCH = 50
 BATCH_SIZE = 24
 DROPOUT = 0.3
 ZONEOUT = 0
+WINDOW = 2
+SAVE_PREV_X = True
 
 
 # In[4]:
@@ -83,6 +85,8 @@ def get_accuracy(truth, pred):
 
 
 def evaluate(model, eval_iter, loss_function,  name ='dev'):
+    if isinstance(model, QRNNClassifier):
+        model.reset()
     model.eval()
     avg_loss = 0.0
     truth_res = []
@@ -144,7 +148,7 @@ def train_epoch(model, train_iter, loss_function, optimizer, text_field, label_f
 
 from model_module.qrnn_classifier import QRNNClassifier
 
-model = QRNNClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, num_layers=LAYERS_NUM, dropout=DROPOUT, zoneout=ZONEOUT)
+model = QRNNClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, dropout=DROPOUT, window = WINDOW)
 model = model.cuda()
 
 
