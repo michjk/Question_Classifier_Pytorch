@@ -142,9 +142,9 @@ model.word_embeddings.weight.data = text_field.vocab.vectors.cuda()
 
 loss_function = nn.NLLLoss()
 update_parameter = filter(lambda p: p.requires_grad, model.parameters())
-optimizer = optim.Adam(update_parameter, lr = 1e-3, weight_decay=5e-4)
+#optimizer = optim.Adam(update_parameter, lr = 1e-3, weight_decay=5e-4)
 #optimizer = optim.Adagrad(update_parameter, lr=1e-3)
-#optimizer = optim.RMSprop(update_parameter, lr=1e-3)
+optimizer = optim.RMSprop(update_parameter, lr=1e-3, alpha=0.99, eps=1e-8, weight_decay=5e-4)
 
 os.system('rm -rf ' + RESULT_PATH)
 configure(RESULT_PATH + "/summaries", flush_secs=2)
