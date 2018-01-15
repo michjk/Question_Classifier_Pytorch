@@ -150,10 +150,9 @@ def train_epoch(model, train_iter, loss_function, optimizer, text_field, label_f
 
 from model_module.qrnn_classifier import QRNNClassifier
 from model_module.lstm_classifier import LSTMClassifier
-'''
+
 model = QRNNClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, dropout=DROPOUT, window = WINDOW)
-'''
-model = LSTMClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, num_layers = LAYERS_NUM, batch_size=BATCH_SIZE, dropout=DROPOUT)
+#model = LSTMClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, num_layers = LAYERS_NUM, batch_size=BATCH_SIZE, dropout=DROPOUT)
 model = model.cuda()
 # In[10]:
 
