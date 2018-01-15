@@ -167,7 +167,7 @@ def load_mr(text_field, label_field, batch_size, path, dev_ratio):
     
     print('building batches')
     train_iter, dev_iter = data.Iterator.splits(
-        (train_data, dev_data), batch_sizes=(batch_size, batch_size),
+        (train_data, dev_data), batch_sizes=(batch_size, len(dev_data)),
         repeat=False, device = None
     )
     
