@@ -26,6 +26,9 @@ import random
 
 from tensorboard_logger import configure, log_value
 
+import re
+import datetime
+
 # In[2]:
 
 
@@ -35,7 +38,7 @@ torch.cuda.manual_seed_all(1)
 random.seed(1)
 
 DATASET_FOLDER = os.path.join("..", "dataset")
-DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "list_of_questions_train_labeled.txt")
+DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "list_of_questions_train_labeled_new_2.txt")
 
 EMBEDDING_DIM = 300
 HIDDEN_DIM = 50
@@ -44,17 +47,18 @@ EPOCH = 200
 BATCH_SIZE = 64
 DEV_RATIO = 0.1
 DROPOUT = 0.5
+ZONEOUT = 0.5
 
 # In[3]:
 
 
 class QRNNClassifier(nn.Module):
-    def __init__(self, embedding_dim, hidden_dim, vocab_size, label_size, batch_size, num_layers, dropout):
+    def __init__(self, embedding_dim, hidden_dim, vocab_size, label_size, batch_size, num_layers, dropout, zoneout):
         super().__init__()
         self.hidden_dim = hidden_dim
         self.batch_size = batch_size
         self.word_embeddings = nn.Embedding(vocab_size, embedding_dim, num_layers)
-        self.qrnn = QRNN(embedding_dim, hidden_dim, dropout=dropout)
+        self.qrnn = QRNN(embedding_dim, hidden_dim, dropout=dropout, zoneout=zoneout)
         self.hidden_to_label = nn.Linear(hidden_dim, label_size)
         self.hidden = self.init_hidden()
     
@@ -151,12 +155,9 @@ def train_epoch(model, train_iter, loss_function, optimizer, text_field, label_f
 
 # In[7]:
 
-
-import re
-
 def tokenizer(text): # create a tokenizer function
     text = text.lower()
-    TOKENIZER_RE = re.compile(r"[A-Z]{2,}(?![a-z])|[A-Z][a-z]+(?=[A-Z])|[\'\w\-]+", re.UNICODE)
+    TOKENIZER_RE = re.compile(r"[A-Z]{2,}(?![a-z])|[A-Z][a-z]+(?=[A-Z])|[\'\w\-]+", re.UNICODE) 
     return TOKENIZER_RE.findall(text)
 
 text_field = data.Field(lower=True, tokenize=tokenizer)
@@ -169,12 +170,13 @@ train_iter, dev_iter = load_mr(text_field, label_field, batch_size=BATCH_SIZE, p
 
 best_dev_acc = 0.0
 
-model = QRNNClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, num_layers=LAYERS_NUM, dropout=DROPOUT)
+model = QRNNClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, num_layers=LAYERS_NUM, dropout=DROPOUT, zoneout=ZONEOUT)
 model = model.cuda()
 
 #vocab, vec = torchwordemb.load_word2vec_bin("../dataset/GoogleNews-vectors-negative300.bin")
 #text_field.vocab.set_vectors(vocab, vec, EMBEDDING_DIM)
 text_field.vocab.load_vectors('glove.6B.300d')
+
 model.word_embeddings.weight.data = text_field.vocab.vectors.cuda()
 #model.word_embeddings.weight.requires_grad = False
 
@@ -183,19 +185,21 @@ model.word_embeddings.weight.data = text_field.vocab.vectors.cuda()
 
 loss_function = nn.NLLLoss()
 update_parameter = filter(lambda p: p.requires_grad, model.parameters())
-optimizer = optim.Adam(update_parameter, lr = 1e-3)
-
+#optimizer = optim.Adam(update_parameter, lr = 5e-4)
+#optimizer = optim.Adagrad(update_parameter, lr=1e-3)
+optimizer = optim.RMSprop(update_parameter, lr=1e-3)
 
 # In[10]:
 
-configure("runs/run_2", flush_secs=2)
+mark = datetime.datetime.now()
+configure("runs/runs_" + str(mark), flush_secs=2)
 
 no_up = 0
 for i in range(EPOCH):
     print('epoch: %d start!' % i)
     train_epoch(model, train_iter, loss_function, optimizer, text_field, label_field, i)
     print('now best dev acc:',best_dev_acc)
-    dev_acc = evaluate(model,dev_iter,loss_function,'dev')
+    dev_acc = evaluate(model,test_iter,loss_function,'dev')
     if dev_acc > best_dev_acc:
         best_dev_acc = dev_acc
         os.system('rm best_models/mr_best_model_minibatch_acc_*.model')
