@@ -44,7 +44,7 @@ headcommit = repo.head.commit
 RESULT_PATH = "runs/runs_" + time.strftime("%a_%d_%b_%Y_%H_%M", time.gmtime(headcommit.committed_date))
 
 EMBEDDING_DIM = 300
-HIDDEN_DIM = 50
+HIDDEN_DIM = 256
 LAYERS_NUM = 1
 EPOCH = 200
 BATCH_SIZE = 64
@@ -142,9 +142,9 @@ model.word_embeddings.weight.data = text_field.vocab.vectors.cuda()
 
 loss_function = nn.NLLLoss()
 update_parameter = filter(lambda p: p.requires_grad, model.parameters())
-#optimizer = optim.Adam(update_parameter, lr = 1e-3, weight_decay=5e-4)
+optimizer = optim.Adam(update_parameter, lr = 1e-3)
 #optimizer = optim.Adagrad(update_parameter, lr=1e-3)
-optimizer = optim.RMSprop(update_parameter, lr=1e-3, alpha=0.99, eps=1e-8, weight_decay=5e-4)
+#optimizer = optim.RMSprop(update_parameter, lr=1e-3, alpha=0.99, eps=1e-8, weight_decay=5e-4)
 
 os.system('rm -rf ' + RESULT_PATH)
 configure(RESULT_PATH + "/summaries", flush_secs=2)
