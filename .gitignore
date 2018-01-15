@@ -107,10 +107,13 @@ venv.bak/
 runs/
 
 #best_model
-best_model/
+best_models/
 
 #vscode
 .vscode/
 
 #vector cache
 .vector_cache/
+
+#.data
+.data/

@@ -24,7 +24,7 @@ def clean_str(string):
     Tokenization/string cleaning for all datasets except for SST.
     Original taken from https://github.com/yoonkim/CNN_sentence/blob/master/process_data.py
     """
-    #string = re.sub(r"[^A-Za-z0-9(),!?\'\`@-]", " ", string)
+    string = re.sub(r"[^A-Za-z0-9(),!?\'\`@-]", " ", string)
     string = re.sub(r"\'s", " \'s", string)
     string = re.sub(r"\'ve", " \'ve", string)
     string = re.sub(r"n\'t", " n\'t", string)
@@ -138,6 +138,9 @@ class FAQ(data.Dataset):
     def splits(cls, text_field, label_field, path, dev_ratio, **kwargs):
         examples = cls(text_field, label_field, path, **kwargs).examples
 
+        print(examples[279].text)
+        print(examples[279].label)
+
         shuffle_indices = np.random.permutation(np.arange(len(examples)))
         np.random.shuffle(examples)
 
@@ -161,7 +164,7 @@ def load_mr(text_field, label_field, batch_size, path, dev_ratio):
 
     text_field.build_vocab(train_data, dev_data)
     label_field.build_vocab(train_data, dev_data)
-
+    
     print('building batches')
     train_iter, dev_iter = data.Iterator.splits(
         (train_data, dev_data), batch_sizes=(batch_size, batch_size),
@@ -169,4 +172,3 @@ def load_mr(text_field, label_field, batch_size, path, dev_ratio):
     )
     
     return train_iter, dev_iter
-

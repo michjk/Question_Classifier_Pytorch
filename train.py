@@ -14,8 +14,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
-import torchqrnn.forget_mult
-from torchqrnn import QRNN
+from model_module.qrnn_classifier import QRNNClassifier
 
 import torchwordemb
 
@@ -29,8 +28,7 @@ from tensorboard_logger import configure, log_value
 import re
 import datetime
 
-# In[2]:
-
+import git
 
 np.random.seed(1)
 torch.manual_seed(1)
@@ -40,6 +38,10 @@ random.seed(1)
 DATASET_FOLDER = os.path.join("..", "dataset")
 DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "list_of_questions_train_labeled_new_2.txt")
 
+repo = git.Repo(os.getcwd())
+headcommit = repo.head.commit
+RESULT_PATH = "runs/runs_" + time.strftime("%a_%d_%b_%Y_%H_%M", time.gmtime(headcommit.committed_date))
+
 EMBEDDING_DIM = 300
 HIDDEN_DIM = 50
 LAYERS_NUM = 1
@@ -48,41 +50,8 @@ BATCH_SIZE = 64
 DEV_RATIO = 0.1
 DROPOUT = 0.5
 ZONEOUT = 0.5
-
-# In[3]:
-
-
-class QRNNClassifier(nn.Module):
-    def __init__(self, embedding_dim, hidden_dim, vocab_size, label_size, batch_size, num_layers, dropout, zoneout):
-        super().__init__()
-        self.hidden_dim = hidden_dim
-        self.batch_size = batch_size
-        self.word_embeddings = nn.Embedding(vocab_size, embedding_dim, num_layers)
-        self.qrnn = QRNN(embedding_dim, hidden_dim, dropout=dropout, zoneout=zoneout)
-        self.hidden_to_label = nn.Linear(hidden_dim, label_size)
-        self.hidden = self.init_hidden()
-    
-    def init_hidden(self):
-        """
-        Initialize weight of hidden
-        """
-        # the first is the hidden h
-        # the second is the cell  c
-        return (autograd.Variable(torch.zeros(1, self.batch_size, self.hidden_dim).cuda()),
-                autograd.Variable(torch.zeros(1, self.batch_size, self.hidden_dim)).cuda())
-    
-    def forward(self, sentence):
-        embeds = self.word_embeddings(sentence)
-        x = embeds.view(len(sentence), self.batch_size, -1)
-        out, self.hidden = self.qrnn(x, self.hidden)
-        y = self.hidden_to_label(out[-1])
-        log_probs = F.log_softmax(y)
-        return log_probs
-        
-
-
-# In[4]:
-
+WINDOW = 1
+SAVE_PREV_X = False
 
 def get_accuracy(truth, pred):
     assert len(truth)==len(pred)
@@ -92,11 +61,9 @@ def get_accuracy(truth, pred):
             right += 1.0
     return right/len(truth)
 
-
-# In[5]:
-
-
 def evaluate(model, eval_iter, loss_function,  name ='dev'):
+    if isinstance(model, QRNNClassifier):
+        model.reset()
     model.eval()
     avg_loss = 0.0
     truth_res = []
@@ -121,11 +88,9 @@ def evaluate(model, eval_iter, loss_function,  name ='dev'):
     log_value('Loss', avg_loss, i)
     return acc
 
-
-# In[6]:
-
-
 def train_epoch(model, train_iter, loss_function, optimizer, text_field, label_field, i):
+    if isinstance(model, QRNNClassifier):
+        model.reset()
     model.train()
     avg_loss = 0.0
     count = 0
@@ -152,9 +117,6 @@ def train_epoch(model, train_iter, loss_function, optimizer, text_field, label_f
     acc = get_accuracy(truth_res,pred_res)
     print('epoch: %d done!\ntrain avg_loss:%g , acc:%g'%(i, avg_loss, acc))
 
-
-# In[7]:
-
 def tokenizer(text): # create a tokenizer function
     text = text.lower()
     TOKENIZER_RE = re.compile(r"[A-Z]{2,}(?![a-z])|[A-Z][a-z]+(?=[A-Z])|[\'\w\-]+", re.UNICODE) 
@@ -164,13 +126,9 @@ text_field = data.Field(lower=True, tokenize=tokenizer)
 label_field = data.Field(sequential=False)
 train_iter, dev_iter = load_mr(text_field, label_field, batch_size=BATCH_SIZE, path = DATASET_PATH, dev_ratio=DEV_RATIO)
 
-
-# In[8]:
-
-
 best_dev_acc = 0.0
 
-model = QRNNClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, num_layers=LAYERS_NUM, dropout=DROPOUT, zoneout=ZONEOUT)
+model = QRNNClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, num_layers=LAYERS_NUM, dropout=DROPOUT, zoneout=ZONEOUT, window = WINDOW, save_prev_x = SAVE_PREV_X)
 model = model.cuda()
 
 #vocab, vec = torchwordemb.load_word2vec_bin("../dataset/GoogleNews-vectors-negative300.bin")
@@ -180,32 +138,27 @@ text_field.vocab.load_vectors('glove.6B.300d')
 model.word_embeddings.weight.data = text_field.vocab.vectors.cuda()
 #model.word_embeddings.weight.requires_grad = False
 
-# In[9]:
-
-
 loss_function = nn.NLLLoss()
 update_parameter = filter(lambda p: p.requires_grad, model.parameters())
-#optimizer = optim.Adam(update_parameter, lr = 5e-4)
+optimizer = optim.Adam(update_parameter, lr = 5e-4)
 #optimizer = optim.Adagrad(update_parameter, lr=1e-3)
-optimizer = optim.RMSprop(update_parameter, lr=1e-3)
+#optimizer = optim.RMSprop(update_parameter, lr=1e-3)
 
-# In[10]:
-
-mark = datetime.datetime.now()
-configure("runs/runs_" + str(mark), flush_secs=2)
+os.system('rm -rf ' + RESULT_PATH)
+configure(RESULT_PATH + "/summaries", flush_secs=2)
 
 no_up = 0
 for i in range(EPOCH):
     print('epoch: %d start!' % i)
     train_epoch(model, train_iter, loss_function, optimizer, text_field, label_field, i)
     print('now best dev acc:',best_dev_acc)
-    dev_acc = evaluate(model,test_iter,loss_function,'dev')
+    dev_acc = evaluate(model,dev_iter, loss_function,'dev')
     if dev_acc > best_dev_acc:
         best_dev_acc = dev_acc
-        os.system('rm best_models/mr_best_model_minibatch_acc_*.model')
-        os.system('mkdir best_models')
+        os.system('rm ' + RESULT_PATH + '/best_models/mr_best_model_minibatch_acc_*.model')
+        os.system('mkdir ' + RESULT_PATH + '/best_models/')
         print('New Best Dev!!!')
-        torch.save(model.state_dict(), 'best_models/mr_best_model_minibatch_acc_' + str(int(dev_acc*10000)) + '.model')
+        torch.save(model.state_dict(), RESULT_PATH + '/best_models/mr_best_model_minibatch_acc_' + str(int(dev_acc*10000)) + '.model')
         no_up = 0
     
     ''' else:
