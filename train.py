@@ -15,6 +15,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 
 from model_module.qrnn_classifier import QRNNClassifier
+from model_module.lstm_classifier import LSTMClassifier
 
 import torchwordemb
 
@@ -128,7 +129,8 @@ train_iter, dev_iter = load_mr(text_field, label_field, batch_size=BATCH_SIZE, p
 
 best_dev_acc = 0.0
 
-model = QRNNClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, num_layers=LAYERS_NUM, dropout=DROPOUT, zoneout=ZONEOUT, window = WINDOW, save_prev_x = SAVE_PREV_X)
+#model = QRNNClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, num_layers=LAYERS_NUM, dropout=DROPOUT, zoneout=ZONEOUT, window = WINDOW, save_prev_x = SAVE_PREV_X)
+model = LSTMClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, num_layers=LAYERS_NUM, dropout=DROPOUT)
 model = model.cuda()
 
 #vocab, vec = torchwordemb.load_word2vec_bin("../dataset/GoogleNews-vectors-negative300.bin")
