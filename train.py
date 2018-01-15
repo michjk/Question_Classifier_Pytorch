@@ -31,10 +31,10 @@ import datetime
 
 import git
 
-np.random.seed(1)
-torch.manual_seed(1)
-torch.cuda.manual_seed_all(1)
-random.seed(1)
+np.random.seed(10)
+torch.manual_seed(10)
+torch.cuda.manual_seed_all(10)
+random.seed(10)
 
 DATASET_FOLDER = os.path.join("..", "dataset")
 DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "list_of_questions_train_labeled_new_2.txt")
