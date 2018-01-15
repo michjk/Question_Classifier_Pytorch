@@ -148,6 +148,7 @@ os.system('rm -rf ' + RESULT_PATH)
 configure(RESULT_PATH + "/summaries", flush_secs=2)
 
 no_up = 0
+start_time = time.time()
 for i in range(EPOCH):
     print('epoch: %d start!' % i)
     train_epoch(model, train_iter, loss_function, optimizer, text_field, label_field, i)
@@ -166,4 +167,5 @@ for i in range(EPOCH):
         if no_up >= 10:
             exit() '''
 
+print("Overall time elapsed {} sec".format(time.time() - start_time))
 
