@@ -48,7 +48,7 @@ EMBEDDING_DIM = 300
 HIDDEN_DIM = 256
 LAYERS_NUM = 1
 EPOCH = 200
-BATCH_SIZE = 64
+BATCH_SIZE = 16
 DEV_RATIO = 0.1
 DROPOUT = 0.5
 ZONEOUT = 0.5
@@ -135,14 +135,14 @@ best_dev_acc = 0.0
 model = QRNNClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, num_layers=LAYERS_NUM, dropout=DROPOUT, zoneout=ZONEOUT, window = WINDOW, save_prev_x = SAVE_PREV_X)
 #model = LSTMClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, num_layers=LAYERS_NUM, dropout=DROPOUT)
 model = model.cuda()
-''' 
-vocab, vec = torchwordemb.load_word2vec_bin("../dataset/GoogleNews-vectors-negative300.bin")
-text_field.vocab.set_vectors(vocab, vec, EMBEDDING_DIM)
-#text_field.vocab.load_vectors('glove.6B.300d')
+ 
+#vocab, vec = torchwordemb.load_word2vec_bin("../dataset/GoogleNews-vectors-negative300.bin")
+#text_field.vocab.set_vectors(vocab, vec, EMBEDDING_DIM)
+text_field.vocab.load_vectors('glove.6B.300d')
 
 model.word_embeddings.weight.data = text_field.vocab.vectors.cuda()
 model.word_embeddings.weight.requires_grad = False
-'''
+
 loss_function = nn.NLLLoss()
 update_parameter = filter(lambda p: p.requires_grad, model.parameters())
 optimizer = optim.Adam(update_parameter, lr = 1e-3)
