@@ -123,9 +123,9 @@ model = model.cuda()
 
 #vocab, vec = torchwordemb.load_word2vec_bin("../dataset/GoogleNews-vectors-negative300.bin")
 #text_field.vocab.set_vectors(vocab, vec, EMBEDDING_DIM)
-text_field.vocab.load_vectors('glove.6B.300d')
+#text_field.vocab.load_vectors('glove.6B.300d')
 
-model.word_embeddings.weight.data = text_field.vocab.vectors.cuda()
+#model.word_embeddings.weight.data = text_field.vocab.vectors.cuda()
 #model.word_embeddings.weight.requires_grad = False
 
 loss_function = nn.NLLLoss()
