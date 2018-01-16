@@ -1,9 +1,3 @@
-
-# coding: utf-8
-
-# In[1]:
-
-
 import time
 
 import numpy as np
@@ -14,8 +8,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
-from model_module.qrnn_classifier import QRNNClassifier
-from model_module.lstm_classifier import LSTMClassifier
+from model_module.cnn_classifier import CNNClassifier
 
 import torchwordemb
 
@@ -44,15 +37,12 @@ headcommit = repo.head.commit
 RESULT_PATH = "runs/runs_" + time.strftime("%a_%d_%b_%Y_%H_%M", time.gmtime(headcommit.committed_date))
 
 EMBEDDING_DIM = 300
-HIDDEN_DIM = 256
-LAYERS_NUM = 1
 EPOCH = 200
 BATCH_SIZE = 64
 DEV_RATIO = 0.1
 DROPOUT = 0.5
-ZONEOUT = 0.5
-WINDOW = 1
-SAVE_PREV_X = False
+KERNEL_SIZES = [3, 4, 5]
+KERNEL_NUM = 128
 
 def get_accuracy(truth, pred):
     assert len(truth)==len(pred)
@@ -63,8 +53,6 @@ def get_accuracy(truth, pred):
     return right/len(truth)
 
 def evaluate(model, eval_iter, loss_function,  name ='dev'):
-    if isinstance(model, QRNNClassifier):
-        model.reset()
     model.eval()
     avg_loss = 0.0
     truth_res = []
@@ -72,10 +60,9 @@ def evaluate(model, eval_iter, loss_function,  name ='dev'):
     print(eval_iter)
     for batch in eval_iter:
         sent, label = batch.text, batch.label
+        sent.data.t_()
         label.data.sub_(1)
         truth_res += list(label.data)
-        model.batch_size = len(label.data)
-        model.hidden = model.init_hidden()  # detaching it from its history on the last instance.
         pred = model(sent)
         pred_label = pred.data.max(1)[1]
         pred_res += [x for x in pred_label]
@@ -90,8 +77,6 @@ def evaluate(model, eval_iter, loss_function,  name ='dev'):
     return acc
 
 def train_epoch(model, train_iter, loss_function, optimizer, text_field, label_field, i):
-    if isinstance(model, QRNNClassifier):
-        model.reset()
     model.train()
     avg_loss = 0.0
     count = 0
@@ -99,10 +84,9 @@ def train_epoch(model, train_iter, loss_function, optimizer, text_field, label_f
     pred_res = []
     for batch in train_iter:
         sent, label = batch.text, batch.label
+        sent.data.t_()
         label.data.sub_(1)
         truth_res += list(label.data)
-        model.batch_size = len(label.data)
-        model.hidden = model.init_hidden()# detaching it from its history on the last instance.
         pred = model(sent)
         pred_label = pred.data.max(1)[1]
         pred_res += [x for x in pred_label]
@@ -114,6 +98,7 @@ def train_epoch(model, train_iter, loss_function, optimizer, text_field, label_f
             print('epoch: %d iterations: %d loss :%g' % (i, count*model.batch_size, loss.data[0]))
         loss.backward()
         optimizer.step()
+    
     avg_loss /= len(train_iter)
     acc = get_accuracy(truth_res,pred_res)
     print('epoch: %d done!\ntrain avg_loss:%g , acc:%g'%(i, avg_loss, acc))
@@ -129,8 +114,7 @@ train_iter, dev_iter = load_iter(text_field, label_field, batch_size=BATCH_SIZE,
 
 best_dev_acc = 0.0
 
-model = QRNNClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, num_layers=LAYERS_NUM, dropout=DROPOUT, zoneout=ZONEOUT, window = WINDOW, save_prev_x = SAVE_PREV_X)
-#model = LSTMClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, num_layers=LAYERS_NUM, dropout=DROPOUT)
+model = CNNClassifier(EMBEDDING_DIM, len(text_field.vocab), len(label_field.vocab)-1, BATCH_SIZE,KERNEL_NUM, KERNEL_SIZES, DROPOUT)
 model = model.cuda()
 
 #vocab, vec = torchwordemb.load_word2vec_bin("../dataset/GoogleNews-vectors-negative300.bin")
@@ -170,4 +154,7 @@ for i in range(EPOCH):
             exit() '''
 
 print("Overall time elapsed {} sec".format(time.time() - start_time))
+
+
+
 

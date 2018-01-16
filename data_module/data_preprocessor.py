@@ -158,7 +158,7 @@ class FAQ(data.Dataset):
     def sort_key(ex):
         return len(ex.text)
 
-def load_mr(text_field, label_field, batch_size, path, dev_ratio):
+def load_iter(text_field, label_field, batch_size, path, dev_ratio):
     print('loading data')
     train_data, dev_data = FAQ.splits(text_field, label_field, path, dev_ratio)
 
