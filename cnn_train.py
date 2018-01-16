@@ -95,7 +95,7 @@ def train_epoch(model, train_iter, loss_function, optimizer, text_field, label_f
         avg_loss += loss.data[0]
         count += 1
         if count % 100 == 0:
-            print('epoch: %d iterations: %d loss :%g' % (i, count*model.batch_size, loss.data[0]))
+            print('epoch: %d iterations: %d loss :%g' % (i, count*len(label.data), loss.data[0]))
         loss.backward()
         optimizer.step()
     
