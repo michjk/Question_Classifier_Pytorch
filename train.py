@@ -85,9 +85,9 @@ def evaluate(model, eval_iter, loss_function, i, eval_logger, name ='dev'):
 
     avg_loss /= len(eval_iter)
     acc = get_accuracy(truth_res, pred_res)
-    print(name + ' avg_loss:%g train acc:%g' % (avg_loss, acc ))
-    eval_logger.log_value("accuracy", i)
-    eval_logger.log_value("loss", i)
+    print(name + ' avg_loss:%g train acc:%g' % (avg_loss, acc))
+    eval_logger.log_value("accuracy", acc, i)
+    eval_logger.log_value("loss", avg_loss, i)
     return acc
 
 def train_epoch(model, train_iter, loss_function, optimizer, text_field, label_field, i, train_logger):
@@ -118,8 +118,8 @@ def train_epoch(model, train_iter, loss_function, optimizer, text_field, label_f
     avg_loss /= len(train_iter)
     acc = get_accuracy(truth_res,pred_res)
     print('epoch: %d done!\ntrain avg_loss:%g , acc:%g'%(i, avg_loss, acc))
-    train_logger.log_value("accuracy", i)
-    train_logger.log_value("loss", i)
+    train_logger.log_value("accuracy", acc, i)
+    train_logger.log_value("loss", avg_loss, i)
 
 def tokenizer(text): # create a tokenizer function
     text = text.lower()
