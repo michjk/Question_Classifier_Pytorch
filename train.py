@@ -24,7 +24,7 @@ from data_module.data_preprocessor import *
 import os
 import random
 
-from tensorboard_logger import configure, log_value
+import tensorboard_logger
 
 import re
 import datetime
@@ -37,11 +37,12 @@ torch.cuda.manual_seed_all(10)
 random.seed(10)
 
 DATASET_FOLDER = os.path.join("..", "dataset")
-DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "list_of_questions_train_labeled_new_2.txt")
+DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "list_of_questions_train_labeled_new_2.txt") 
 
 repo = git.Repo(os.getcwd())
 headcommit = repo.head.commit
-RESULT_PATH = "runs/runs_" + time.strftime("%a_%d_%b_%Y_%H_%M", time.gmtime(headcommit.committed_date))
+current_branch = repo.active_branch.name
+RESULT_PATH = "runs/runs_" + current_branch + "_" + time.strftime("%a_%d_%b_%Y_%H_%M", time.gmtime(headcommit.committed_date))
 
 EMBEDDING_DIM = 300
 HIDDEN_DIM = 256
@@ -62,7 +63,7 @@ def get_accuracy(truth, pred):
             right += 1.0
     return right/len(truth)
 
-def evaluate(model, eval_iter, loss_function,  name ='dev'):
+def evaluate(model, eval_iter, loss_function, i, eval_logger, name ='dev'):
     if isinstance(model, QRNNClassifier):
         model.reset()
     model.eval()
@@ -85,11 +86,11 @@ def evaluate(model, eval_iter, loss_function,  name ='dev'):
     avg_loss /= len(eval_iter)
     acc = get_accuracy(truth_res, pred_res)
     print(name + ' avg_loss:%g train acc:%g' % (avg_loss, acc ))
-    log_value('Accuracy', acc, i)
-    log_value('Loss', avg_loss, i)
+    eval_logger.log_value("accuracy", i)
+    eval_logger.log_value("loss", i)
     return acc
 
-def train_epoch(model, train_iter, loss_function, optimizer, text_field, label_field, i):
+def train_epoch(model, train_iter, loss_function, optimizer, text_field, label_field, i, train_logger):
     if isinstance(model, QRNNClassifier):
         model.reset()
     model.train()
@@ -117,6 +118,8 @@ def train_epoch(model, train_iter, loss_function, optimizer, text_field, label_f
     avg_loss /= len(train_iter)
     acc = get_accuracy(truth_res,pred_res)
     print('epoch: %d done!\ntrain avg_loss:%g , acc:%g'%(i, avg_loss, acc))
+    train_logger.log_value("accuracy", i)
+    train_logger.log_value("loss", i)
 
 def tokenizer(text): # create a tokenizer function
     text = text.lower()
@@ -147,15 +150,16 @@ optimizer = optim.Adam(update_parameter, lr = 1e-3)
 #optimizer = optim.RMSprop(update_parameter, lr=1e-3, alpha=0.99, eps=1e-8, weight_decay=5e-4)
 
 os.system('rm -rf ' + RESULT_PATH)
-configure(RESULT_PATH + "/summaries", flush_secs=2)
+train_logger = tensorboard_logger.Logger(RESULT_PATH + "/summaries/train/")
+dev_logger = tensorboard_logger.Logger(RESULT_PATH + '/summaries/dev/')
 
 no_up = 0
 start_time = time.time()
 for i in range(EPOCH):
     print('epoch: %d start!' % i)
-    train_epoch(model, train_iter, loss_function, optimizer, text_field, label_field, i)
+    train_epoch(model, train_iter, loss_function, optimizer, text_field, label_field, i, train_logger)
     print('now best dev acc:',best_dev_acc)
-    dev_acc = evaluate(model,dev_iter, loss_function,'dev')
+    dev_acc = evaluate(model,dev_iter, loss_function, i, dev_logger, 'dev')
     if dev_acc > best_dev_acc:
         best_dev_acc = dev_acc
         os.system('rm ' + RESULT_PATH + '/best_models/mr_best_model_minibatch_acc_*.model')
@@ -163,11 +167,12 @@ for i in range(EPOCH):
         print('New Best Dev!!!')
         torch.save(model.state_dict(), RESULT_PATH + '/best_models/mr_best_model_minibatch_acc_' + str(int(dev_acc*10000)) + '.model')
         no_up = 0
-    
-    ''' else:
+    '''
+    else:
         no_up += 1
         if no_up >= 10:
-            exit() '''
+            break
+    '''
 
 print("Overall time elapsed {} sec".format(time.time() - start_time))
 
