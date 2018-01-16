@@ -136,12 +136,12 @@ model = QRNNClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab
 #model = LSTMClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, num_layers=LAYERS_NUM, dropout=DROPOUT)
 model = model.cuda()
 
-vocab, vec = torchwordemb.load_word2vec_bin("../dataset/GoogleNews-vectors-negative300.bin")
-text_field.vocab.set_vectors(vocab, vec, EMBEDDING_DIM)
-#text_field.vocab.load_vectors('glove.6B.300d')
+#vocab, vec = torchwordemb.load_word2vec_bin("../dataset/GoogleNews-vectors-negative300.bin")
+#text_field.vocab.set_vectors(vocab, vec, EMBEDDING_DIM)
+text_field.vocab.load_vectors('glove.6B.300d')
 
 model.word_embeddings.weight.data = text_field.vocab.vectors.cuda()
-#model.word_embeddings.weight.requires_grad = False
+model.word_embeddings.weight.requires_grad = False
 
 loss_function = nn.NLLLoss()
 update_parameter = filter(lambda p: p.requires_grad, model.parameters())
