@@ -126,7 +126,7 @@ model = model.cuda()
 text_field.vocab.load_vectors('glove.6B.300d')
 
 model.word_embeddings.weight.data = text_field.vocab.vectors.cuda()
-#model.word_embeddings.weight.requires_grad = False
+model.word_embeddings.weight.requires_grad = False
 
 loss_function = nn.NLLLoss()
 update_parameter = filter(lambda p: p.requires_grad, model.parameters())
