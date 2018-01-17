@@ -158,14 +158,14 @@ class FAQ(data.Dataset):
 def load_iter(text_field, label_field, batch_size, path, dev_ratio):
     print('loading data')
     train_data, dev_data = FAQ.splits(text_field, label_field, path, dev_ratio)
-    
+
     text_field.build_vocab(train_data, dev_data)
     label_field.build_vocab(train_data, dev_data)
     
     print('building batches')
     train_iter, dev_iter = data.BucketIterator.splits(
         (train_data, dev_data), batch_sizes=(batch_size, len(dev_data)),
-        repeat=False, device = None
+        repeat=False, device = None, shuffle = True
     )
     
     return train_iter, dev_iter
