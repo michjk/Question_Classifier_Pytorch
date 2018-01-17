@@ -137,10 +137,7 @@ class FAQ(data.Dataset):
     @classmethod
     def splits(cls, text_field, label_field, path, dev_ratio, **kwargs):
         examples = cls(text_field, label_field, path, **kwargs).examples
-
-        print(examples[279].text)
-        print(examples[279].label)
-
+        
         shuffle_indices = np.random.permutation(np.arange(len(examples)))
         np.random.shuffle(examples)
 
@@ -161,12 +158,12 @@ class FAQ(data.Dataset):
 def load_iter(text_field, label_field, batch_size, path, dev_ratio):
     print('loading data')
     train_data, dev_data = FAQ.splits(text_field, label_field, path, dev_ratio)
-
+    
     text_field.build_vocab(train_data, dev_data)
     label_field.build_vocab(train_data, dev_data)
     
     print('building batches')
-    train_iter, dev_iter = data.Iterator.splits(
+    train_iter, dev_iter = data.BucketIterator.splits(
         (train_data, dev_data), batch_sizes=(batch_size, len(dev_data)),
         repeat=False, device = None
     )
