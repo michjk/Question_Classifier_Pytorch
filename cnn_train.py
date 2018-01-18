@@ -24,10 +24,10 @@ import datetime
 
 import git
 
-np.random.seed(10)
-torch.manual_seed(10)
-torch.cuda.manual_seed_all(10)
-random.seed(10)
+np.random.seed(1)
+torch.manual_seed(1)
+torch.cuda.manual_seed_all(1)
+random.seed(1)
 
 DATASET_FOLDER = os.path.join("..", "dataset")
 DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "list_of_questions_train_labeled_new_2.txt")
@@ -38,8 +38,8 @@ current_branch = repo.active_branch.name
 RESULT_PATH = "runs/runs_" + current_branch + "_" + time.strftime("%a_%d_%b_%Y_%H_%M", time.gmtime(headcommit.committed_date))
 
 EMBEDDING_DIM = 300
-EPOCH = 200
-BATCH_SIZE = 64
+EPOCH = 400
+BATCH_SIZE = 32
 DEV_RATIO = 0.1
 DROPOUT = 0.5
 KERNEL_SIZES = [3, 4, 5]
