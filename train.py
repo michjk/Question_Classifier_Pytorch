@@ -52,7 +52,7 @@ BATCH_SIZE = 32
 DEV_RATIO = 0.1
 DROPOUT = 0.5
 ZONEOUT = 0.5
-WINDOW = 2
+WINDOW = 1
 SAVE_PREV_X = False
 
 def get_accuracy(truth, pred):
