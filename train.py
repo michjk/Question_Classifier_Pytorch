@@ -53,7 +53,7 @@ DEV_RATIO = 0.1
 DROPOUT = 0.5
 ZONEOUT = 0.5
 WINDOW = 2
-SAVE_PREV_X = True
+SAVE_PREV_X = False
 MAX_TEXT_LENGHT = 36
 
 def get_accuracy(truth, pred):
