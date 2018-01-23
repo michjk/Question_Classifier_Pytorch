@@ -62,8 +62,6 @@ def get_accuracy(truth, pred):
     return right/len(truth)
 
 def evaluate(model, eval_iter, loss_function, i, name ='dev', eval_logger=None):
-    if isinstance(model, QRNNClassifier):
-        model.reset()
     model.eval()
     avg_loss = 0.0
     truth_res = []
@@ -88,8 +86,6 @@ def evaluate(model, eval_iter, loss_function, i, name ='dev', eval_logger=None):
     return acc, avg_loss
 
 def train_epoch(model, train_iter, loss_function, optimizer, text_field, label_field, i, train_logger=None):
-    if isinstance(model, QRNNClassifier):
-        model.reset()
     model.train()
     avg_loss = 0.0
     count = 0
