@@ -39,7 +39,7 @@ RESULT_PATH = "runs/runs_" + current_branch + "_" + time.strftime("%a_%d_%b_%Y_%
 
 EMBEDDING_DIM = 300
 EPOCH = 400
-BATCH_SIZE = 32
+BATCH_SIZE = 64
 DEV_RATIO = 0.1
 DROPOUT = 0.5
 KERNEL_SIZES = [3, 4, 5]
