@@ -153,10 +153,6 @@ for i in range(EPOCH):
         print('New Best Dev!!!')
         torch.save(model.state_dict(), RESULT_PATH + '/best_models/mr_best_model_minibatch_acc_' + str(int(dev_acc*10000)) + '.model')
         no_up = 0
-    else:
-        no_up += 1
-        if no_up >= 10:
-            break
 
 print("Overall time elapsed {} sec".format(time.time() - start_time))
 
