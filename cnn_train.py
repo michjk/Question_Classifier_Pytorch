@@ -44,6 +44,7 @@ DEV_RATIO = 0.1
 DROPOUT = 0.5
 KERNEL_SIZES = [3, 4, 5]
 KERNEL_NUM = 128
+MAX_TEXT_LENGHT = 36
 
 def get_accuracy(truth, pred):
     assert len(truth)==len(pred)
@@ -121,12 +122,12 @@ best_dev_acc = 0.0
 model = CNNClassifier(EMBEDDING_DIM, len(text_field.vocab), len(label_field.vocab)-1, BATCH_SIZE,KERNEL_NUM, KERNEL_SIZES, DROPOUT)
 model = model.cuda()
 
-vocab, vec = torchwordemb.load_word2vec_bin("../dataset/GoogleNews-vectors-negative300.bin")
-text_field.vocab.set_vectors(vocab, vec, EMBEDDING_DIM)
-#text_field.vocab.load_vectors('glove.6B.300d')
+#vocab, vec = torchwordemb.load_word2vec_bin("../dataset/GoogleNews-vectors-negative300.bin")
+#text_field.vocab.set_vectors(vocab, vec, EMBEDDING_DIM)
+text_field.vocab.load_vectors('glove.6B.300d')
 
 model.word_embeddings.weight.data = text_field.vocab.vectors.cuda()
-#model.word_embeddings.weight.requires_grad = False
+model.word_embeddings.weight.requires_grad = False
 
 loss_function = nn.NLLLoss()
 update_parameter = filter(lambda p: p.requires_grad, model.parameters())
