@@ -9,6 +9,8 @@ from tensorflow.contrib import learn
 from torchtext import data
 import codecs
 
+from sklearn.model_selection import KFold
+
 label_place= set(['New_York_City', 'New_Haven,_Connecticut', 'Portugal', 'Southampton'])
 label_event = set(['American_Idol', '2008_Sichuan_earthquake', '2008_Summer_Olympics_torch_relay', 'The_Blitz'])
 label_person = set(['Beyonce', 'Frederic_Chopin', 'Queen_Victoria', 'Muammar_Gaddafi', 'Napoleon', 'Gamal_Abdel_Nasser', 'Dwight_D._Eisenhower', 'Kanye_West'])
@@ -134,26 +136,48 @@ class FAQ(data.Dataset):
         
         super().__init__(examples, fields, **kwargs)
     
-    @classmethod
-    def splits(cls, text_field, label_field, path, dev_ratio, **kwargs):
-        examples = cls(text_field, label_field, path, **kwargs).examples
-        
-        shuffle_indices = np.random.permutation(np.arange(len(examples)))
-        np.random.shuffle(examples)
-
-        dev_length = -1*int(dev_ratio*float(len(examples)))
-
-        train_examples, dev_examples = examples[:dev_length], examples[dev_length:]
-
-        print('train:',len(train_examples),'dev:',len(dev_examples))
-
-        return (cls(text_field, label_field, examples=train_examples),
-                cls(text_field, label_field, examples=dev_examples)
-                )
-    
     @staticmethod
     def sort_key(ex):
         return len(ex.text)
+
+    @classmethod
+    def splits(cls, text_field, label_field, path, test_ratio, **kwargs):
+        examples = cls(text_field, label_field, path, **kwargs).examples
+        np.random.shuffle(examples)
+
+        test_length = -1*int(test_ratio*float(len(examples)))
+        train_examples, test_examples = examples[:test_length], examples[test_length:]
+
+        print('train:',len(train_examples),'test:',len(test_examples))
+
+        return (cls(text_field, label_field, examples=train_examples),
+                cls(text_field, label_field, examples=test_examples)
+                )
+    
+    @classmethod
+    def splits_cv(cls, text_field, label_field, path, test_ratio, n_splits,  **kwargs):
+        examples = cls(text_field, label_field, path, **kwargs).examples
+        np.random.shuffle(examples)
+
+        test_length = -1*int(test_ratio*float(len(examples)))
+        train_examples, test_examples = examples[:test_length], examples[test_length:]
+        train_examples = np.array(train_examples)
+
+        test_data = cls(text_field, label_field, examples=test_examples)
+        
+        train_data = []
+        dev_data = []
+        kfold_iter = KFold(n_splits=n_splits).split(train_examples)
+        print(train_examples)
+        for train_index, dev_index in kfold_iter:
+            train_part = train_examples[train_index].tolist()
+            dev_part = train_examples[dev_index].tolist()
+            train_data.append(cls(text_field, label_field, examples=train_part))
+            dev_data.append(cls(text_field, label_field, examples=dev_part))
+        
+        print('train:',len(train_data[0].examples),'test:',len(test_examples), 'dev:', len(dev_data[0].examples))
+
+        return (train_data, dev_data, test_data)
 
 def load_iter(text_field, label_field, batch_size, path, dev_ratio):
     print('loading data')
@@ -167,5 +191,36 @@ def load_iter(text_field, label_field, batch_size, path, dev_ratio):
         (train_data, dev_data), batch_sizes=(batch_size, len(dev_data)),
         repeat=False, device = None, shuffle = True
     )
-    
+
     return train_iter, dev_iter
+
+def load_iter_cv(text_field, label_field, batch_size, path, test_ratio, n_splits):
+    print('loading data')
+    train_data, dev_data, test_data = FAQ.splits_cv(text_field, label_field, path, test_ratio, n_splits)
+
+    print(train_data[0])
+    print(dev_data[0])
+    print(test_data)
+
+    text_field.build_vocab(test_data)
+    label_field.build_vocab(train_data[0], dev_data[0], test_data)
+
+    print('building batches')
+
+    train_dev_iter = []
+    for i in range(len(train_data)):
+        train_iter, dev_iter = data.Iterator.splits(
+            (train_data[i], dev_data[i]), batch_sizes=(batch_size, len(dev_data[i])),
+            repeat=False, device = None
+        )
+
+        train_dev_iter.append((train_iter, dev_iter))
+    
+    print("build test")
+    _, test_iter = data.Iterator.splits(
+        (train_data[0], test_data), batch_size=len(test_data),
+        repeat=False, device = None
+    )
+
+    return train_dev_iter, test_iter
+    
