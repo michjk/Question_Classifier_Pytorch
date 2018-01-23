@@ -69,6 +69,7 @@ def evaluate(model, eval_iter, loss_function, i, name ='dev', eval_logger=None):
     print(eval_iter)
     for batch in eval_iter:
         sent, label = batch.text, batch.label
+        sent.data.t_()
         label.data.sub_(1)
         truth_res += list(label.data)
         pred = model(sent)
@@ -93,6 +94,7 @@ def train_epoch(model, train_iter, loss_function, optimizer, text_field, label_f
     pred_res = []
     for batch in train_iter:
         sent, label = batch.text, batch.label
+        sent.data.t_()
         label.data.sub_(1)
         truth_res += list(label.data)
         pred = model(sent)
