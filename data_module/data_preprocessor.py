@@ -163,7 +163,7 @@ def load_iter(text_field, label_field, batch_size, path, dev_ratio):
     label_field.build_vocab(train_data, dev_data)
     
     print('building batches')
-    train_iter, dev_iter = data.BucketIterator.splits(
+    train_iter, dev_iter = data.Iterator.splits(
         (train_data, dev_data), batch_sizes=(batch_size, len(dev_data)),
         repeat=False, device = None, shuffle = True
     )

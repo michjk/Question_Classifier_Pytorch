@@ -54,6 +54,7 @@ DROPOUT = 0.5
 ZONEOUT = 0.5
 WINDOW = 1
 SAVE_PREV_X = False
+MAX_TEXT_LENGHT = 36
 
 def get_accuracy(truth, pred):
     assert len(truth)==len(pred)
@@ -126,7 +127,7 @@ def tokenizer(text): # create a tokenizer function
     TOKENIZER_RE = re.compile(r"[A-Z]{2,}(?![a-z])|[A-Z][a-z]+(?=[A-Z])|[\'\w\-]+", re.UNICODE) 
     return TOKENIZER_RE.findall(text)
 
-text_field = data.Field(lower=True, tokenize=tokenizer)
+text_field = data.Field(lower=True, tokenize=tokenizer, fix_length=MAX_TEXT_LENGHT)
 label_field = data.Field(sequential=False)
 train_iter, dev_iter = load_iter(text_field, label_field, batch_size=BATCH_SIZE, path = DATASET_PATH, dev_ratio=DEV_RATIO)
 
