@@ -202,7 +202,7 @@ def load_iter_cv(text_field, label_field, batch_size, path, test_ratio, n_splits
     print(dev_data[0])
     print(test_data)
 
-    text_field.build_vocab(test_data)
+    text_field.build_vocab(train_data[0], dev_data[0], test_data)
     label_field.build_vocab(train_data[0], dev_data[0], test_data)
 
     print('building batches')
