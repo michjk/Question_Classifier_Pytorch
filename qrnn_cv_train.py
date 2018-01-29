@@ -37,7 +37,7 @@ torch.cuda.manual_seed_all(1)
 random.seed(1)
 
 DATASET_FOLDER = os.path.join("..", "dataset")
-DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "list_of_questions_train_labeled_new_2.txt") 
+DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "faq_ntu_prototype.txt") 
 
 repo = git.Repo(os.getcwd())
 headcommit = repo.head.commit
@@ -54,7 +54,7 @@ DROPOUT = 0.5
 ZONEOUT = 0.5
 WINDOW = 2
 SAVE_PREV_X = False
-MAX_TEXT_LENGHT = 36
+MAX_TEXT_LENGHT = None
 n_splits = 10
 
 def get_accuracy(truth, pred):
@@ -101,6 +101,8 @@ def train_epoch(model, train_iter, loss_function, optimizer, text_field, label_f
     count = 0
     truth_res = []
     pred_res = []
+    print("start epoch")
+    print(len(train_iter))
     for batch in train_iter:
         sent, label = batch.text, batch.label
         label.data.sub_(1)
