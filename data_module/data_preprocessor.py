@@ -122,17 +122,17 @@ class FAQ(data.Dataset):
             questions, labels = load_data_and_labels_highest_freq_clustered(path, 20)
             len_questions = len(questions)
 
-            for i in range(len_questions):
+            '''for i in range(len_questions):
                 examples.append(data.Example.fromlist([questions[i], labels[i]], fields))
-            
-            ''' with codecs.open(path,'r','utf8') as f:
+            '''
+            with codecs.open(path,'r','utf8') as f:
                 for line in f:
                     tmp = line.split()
                     x = " ".join(tmp[1:])
-                    #x = clean_str(x)
+                    x = clean_str(x)
                     y = tmp[0]
                     questions.append(x)
-                    examples.append(data.Example.fromlist([x, y], fields)) '''
+                    examples.append(data.Example.fromlist([x, y], fields))
         
         super().__init__(examples, fields, **kwargs)
     
