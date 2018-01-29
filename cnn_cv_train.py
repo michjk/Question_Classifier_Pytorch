@@ -36,7 +36,7 @@ torch.cuda.manual_seed_all(1)
 random.seed(1)
 
 DATASET_FOLDER = os.path.join("..", "dataset")
-DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "list_of_questions_train_labeled_new_2.txt") 
+DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "faq_ntu_prototype.txt") 
 
 repo = git.Repo(os.getcwd())
 headcommit = repo.head.commit
@@ -50,7 +50,7 @@ DEV_RATIO = 0.1
 DROPOUT = 0.5
 KERNEL_SIZES = [3, 4, 5]
 KERNEL_NUM = 128
-MAX_TEXT_LENGHT = 36
+MAX_TEXT_LENGHT = 81
 n_splits = 10
 
 def get_accuracy(truth, pred):
