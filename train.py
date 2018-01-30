@@ -37,7 +37,7 @@ torch.cuda.manual_seed_all(1)
 random.seed(1)
 
 DATASET_FOLDER = os.path.join("..", "dataset")
-DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "list_of_questions_train_labeled_new_2.txt") 
+DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "faq_ntu_prototype_v2.txt") 
 
 repo = git.Repo(os.getcwd())
 headcommit = repo.head.commit
@@ -54,7 +54,7 @@ DROPOUT = 0.5
 ZONEOUT = 0.5
 WINDOW = 2
 SAVE_PREV_X = False
-MAX_TEXT_LENGHT = 36
+MAX_TEXT_LENGHT = None
 
 def get_accuracy(truth, pred):
     assert len(truth)==len(pred)
@@ -133,8 +133,8 @@ train_iter, dev_iter = load_iter(text_field, label_field, batch_size=BATCH_SIZE,
 
 best_dev_acc = 0.0
 
-#model = QRNNClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, num_layers=LAYERS_NUM, dropout=DROPOUT, zoneout=ZONEOUT, window = WINDOW, save_prev_x = SAVE_PREV_X)
-model = LSTMClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, num_layers=LAYERS_NUM, dropout=DROPOUT)
+model = QRNNClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, num_layers=LAYERS_NUM, dropout=DROPOUT, zoneout=ZONEOUT, window = WINDOW, save_prev_x = SAVE_PREV_X)
+#model = LSTMClassifier(embedding_dim=EMBEDDING_DIM, hidden_dim=HIDDEN_DIM, vocab_size=len(text_field.vocab),label_size=len(label_field.vocab)-1, batch_size=BATCH_SIZE, num_layers=LAYERS_NUM, dropout=DROPOUT)
 model = model.cuda()
 ''' 
 vocab, vec = torchwordemb.load_word2vec_bin("../dataset/GoogleNews-vectors-negative300.bin")

@@ -36,7 +36,7 @@ torch.cuda.manual_seed_all(1)
 random.seed(1)
 
 DATASET_FOLDER = os.path.join("..", "dataset")
-DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "faq_ntu_prototype.txt") 
+DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "faq_ntu_prototype_v2.txt") 
 
 repo = git.Repo(os.getcwd())
 headcommit = repo.head.commit
