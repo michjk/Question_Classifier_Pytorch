@@ -299,4 +299,13 @@ def load_iter_cv(text_field, label_field, batch_size, path, test_ratio, n_splits
     )
 
     return train_dev_iter, test_iter
-    
+
+class QuestionWrapper(data.Dataset):
+    def __init__(self, text_field, question, **kwargs):
+        fields = [('text', text_field)]
+        question = clean_str(question)
+        examples = []
+        examples.append(data.Example.fromlist([question], fields))
+
+        super().__init__(examples, fields, **kwargs)
+
