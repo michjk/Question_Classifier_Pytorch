@@ -253,7 +253,7 @@ class FAQ(data.Dataset):
 
         return (train_data, dev_data, test_data)
 
-def load_iter(text_field, label_field, batch_size, path, dev_ratio):
+def load_iter(text_field, label_field, batch_size, path, dev_ratio, cpu = -1):
     print('loading data')
     train_data, dev_data = FAQ.splits(text_field, label_field, path, dev_ratio)
 
@@ -263,7 +263,7 @@ def load_iter(text_field, label_field, batch_size, path, dev_ratio):
     print('building batches')
     train_iter, dev_iter = data.Iterator.splits(
         (train_data, dev_data), batch_sizes=(batch_size, len(dev_data)),
-        repeat=False, device = None, shuffle = True
+        repeat=False, device = cpu, shuffle = True
     )
 
     return train_iter, dev_iter
