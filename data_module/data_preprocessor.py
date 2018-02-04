@@ -4,8 +4,6 @@ import itertools
 from collections import Counter
 import json
 
-from tensorflow.contrib import learn
-
 from torchtext import data
 import codecs
 
