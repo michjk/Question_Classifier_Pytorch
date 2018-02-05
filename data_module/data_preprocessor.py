@@ -253,7 +253,7 @@ class FAQ(data.Dataset):
 
         return (train_data, dev_data, test_data)
 
-def load_iter(text_field, label_field, batch_size, path, dev_ratio, cpu = -1):
+def load_iter(text_field, label_field, batch_size, path, dev_ratio, cpu = None):
     print('loading data')
     train_data, dev_data = FAQ.splits(text_field, label_field, path, dev_ratio)
 
@@ -278,6 +278,8 @@ def load_iter_cv(text_field, label_field, batch_size, path, test_ratio, n_splits
 
     text_field.build_vocab(train_data[0], dev_data[0], test_data)
     label_field.build_vocab(train_data[0], dev_data[0], test_data)
+
+    print("label size ", len(label_field.vocab))
 
     print('building batches')
 
