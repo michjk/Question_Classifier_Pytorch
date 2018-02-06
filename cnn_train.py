@@ -24,10 +24,10 @@ import datetime
 
 import git
 
-np.random.seed(1)
-torch.manual_seed(1)
-torch.cuda.manual_seed_all(1)
-random.seed(1)
+np.random.seed(200)
+torch.manual_seed(200)
+torch.cuda.manual_seed_all(200)
+random.seed(200)
 
 DATASET_FOLDER = os.path.join("..", "dataset")
 DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "faq_ntu_prototype_v4.txt")
@@ -38,7 +38,7 @@ current_branch = repo.active_branch.name
 RESULT_PATH = "runs/runs_" + current_branch + "_" + time.strftime("%a_%d_%b_%Y_%H_%M", time.gmtime(headcommit.committed_date))
 
 EMBEDDING_DIM = 300
-EPOCH = 400
+EPOCH = 10
 BATCH_SIZE = 64
 DEV_RATIO = 0.1
 DROPOUT = 0.5
@@ -54,7 +54,7 @@ def get_accuracy(truth, pred):
             right += 1.0
     return right/len(truth)
 
-def evaluate(model, eval_iter, loss_function, i, eval_logger, name ='dev'):
+def evaluate(model, eval_iter, loss_function, i, eval_logger, label_field, name ='dev'):
     model.eval()
     avg_loss = 0.0
     truth_res = []
@@ -76,7 +76,11 @@ def evaluate(model, eval_iter, loss_function, i, eval_logger, name ='dev'):
     print(name + ' avg_loss:%g train acc:%g' % (avg_loss, acc ))
     eval_logger.log_value("accuracy", acc, i)
     eval_logger.log_value("loss", avg_loss, i)
-    return acc
+
+    truth_res = [label_field.vocab.itos[i+1] for i in truth_res]
+    pred_res = [label_field.vocab.itos[i+1] for i in pred_res]    
+    
+    return acc, truth_res, pred_res
 
 def train_epoch(model, train_iter, loss_function, optimizer, text_field, label_field, i, train_logger):
     model.train()
@@ -106,7 +110,6 @@ def train_epoch(model, train_iter, loss_function, optimizer, text_field, label_f
     print('epoch: %d done!\ntrain avg_loss:%g , acc:%g'%(i, avg_loss, acc))
     train_logger.log_value("accuracy", acc, i)
     train_logger.log_value("loss", avg_loss, i)
-
 
 def tokenizer(text): # create a tokenizer function
     text = text.lower()
@@ -141,20 +144,30 @@ dev_logger = tensorboard_logger.Logger(RESULT_PATH + '/summaries/dev/')
 
 no_up = 0
 start_time = time.time()
+
+best_truth_res = []
+best_pred_res = []
+
 for i in range(EPOCH):
     print('epoch: %d start!' % i)
     train_epoch(model, train_iter, loss_function, optimizer, text_field, label_field, i, train_logger)
     print('now best dev acc:',best_dev_acc)
-    dev_acc = evaluate(model,dev_iter, loss_function, i, dev_logger, 'dev')
+    dev_acc, truth_res, pred_res = evaluate(model,dev_iter, loss_function, i, dev_logger, label_field, 'dev')
     if dev_acc > best_dev_acc:
         best_dev_acc = dev_acc
         os.system('rm ' + RESULT_PATH + '/best_models/mr_best_model_minibatch_acc_*.model')
         os.system('mkdir ' + RESULT_PATH + '/best_models/')
         print('New Best Dev!!!')
         torch.save(model.state_dict(), RESULT_PATH + '/best_models/mr_best_model_minibatch_acc_' + str(int(dev_acc*10000)) + '.model')
+        best_truth_res = truth_res
+        best_pred_res = pred_res
         no_up = 0
 
 print("Overall time elapsed {} sec".format(time.time() - start_time))
+
+from data_module.data_output import createConfusionMatrix
+
+createConfusionMatrix(best_truth_res, best_pred_res, RESULT_PATH + "/summaries/confussion_matrix.png")
 
 
 
