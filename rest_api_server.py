@@ -22,7 +22,7 @@ app = Flask(__name__)
 MODEL_STATE_PATH = "faq_best_model.model"
 
 DATASET_FOLDER = os.path.join("..", "dataset")
-DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "faq_ntu_prototype_v2.txt")
+DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "faq_ntu_prototype_v4.txt")
 
 EMBEDDING_DIM = 300
 EPOCH = 400
