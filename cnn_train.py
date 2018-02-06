@@ -38,7 +38,7 @@ current_branch = repo.active_branch.name
 RESULT_PATH = "runs/runs_" + current_branch + "_" + time.strftime("%a_%d_%b_%Y_%H_%M", time.gmtime(headcommit.committed_date))
 
 EMBEDDING_DIM = 300
-EPOCH = 10
+EPOCH = 200
 BATCH_SIZE = 64
 DEV_RATIO = 0.1
 DROPOUT = 0.5
