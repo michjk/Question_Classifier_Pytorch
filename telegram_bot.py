@@ -10,7 +10,7 @@ args = parser.parse_args()
 
 #'543323547:AAHAEgEUZYRXKnMg-lUEcwv0TLxDXJ2Rib8'
 TOKEN = args.token
-URL = 'http://127.0.0.1:5000'
+URL = 'http://155.69.146.216:4444'
 
 def predict(bot, update):
     predict_msg = {'question': update.message.text}
