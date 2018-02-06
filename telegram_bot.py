@@ -15,7 +15,7 @@ URL = 'http://155.69.146.216:4444'
 def predict(bot, update):
     predict_msg = {'question': update.message.text}
     resp = requests.post(URL+"/predict", json=predict_msg)
-    update.message.reply_text(resp.json()['result'])
+    update.message.reply_text("Possible topic: " + resp.json()['result'])
 
 def main():
     # Create Updater object and attach dispatcher to it

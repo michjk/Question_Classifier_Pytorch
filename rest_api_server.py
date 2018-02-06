@@ -90,16 +90,7 @@ def get_label(label_tensor):
 
     logger.info(label_string)
 
-    label_string = postprocessing_label(label_string)
     return label_string
-
-def postprocessing_label(label_string):
-    tmp1 = label_string.split("+")
-    tmp2 = "Possible choices: "
-    for i in tmp1:
-        tmp2 += "\n"+" ".join(i.split("-"))
-    
-    return tmp2
 
 @app.route('/predict', methods=['POST'])
 def prediction():
