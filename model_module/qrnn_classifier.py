@@ -13,6 +13,7 @@ class QRNNClassifier(nn.Module):
         self.batch_size = batch_size
         self.word_embeddings = nn.Embedding(vocab_size, embedding_dim)
         self.qrnn = QRNN(embedding_dim, hidden_dim, dropout=dropout, zoneout=zoneout, window = window, save_prev_x = save_prev_x)
+        self.dropout = nn.Dropout(dropout)
         self.hidden_to_label = nn.Linear(hidden_dim, label_size)
         self.hidden = self.init_hidden()
     
@@ -32,6 +33,7 @@ class QRNNClassifier(nn.Module):
         embeds = self.word_embeddings(sentence)
         x = embeds.view(len(sentence), self.batch_size, -1)
         out, self.hidden = self.qrnn(x, self.hidden)
+        out = self.dropout(out)
         y = self.hidden_to_label(out[-1])
         log_probs = F.log_softmax(y)
         return log_probs
