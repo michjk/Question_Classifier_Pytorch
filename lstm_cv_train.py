@@ -167,11 +167,11 @@ for train_iter, dev_iter in train_dev_iter:
             best_dev_acc = dev_acc
             best_dev_loss = dev_loss
             no_up = 0
-        else:
+        '''else:
             no_up += 1
             if no_up >= 10:
                 break
-    
+        '''
     cur_cv += 1
     best_dev_acc_list.append(best_dev_acc)
     best_dev_loss_list.append(best_dev_loss)
