@@ -44,7 +44,7 @@ current_branch = repo.active_branch.name
 RESULT_PATH = "runs/runs_" + current_branch + "_" + time.strftime("%a_%d_%b_%Y_%H_%M", time.gmtime(headcommit.committed_date))
 
 EMBEDDING_DIM = 300
-EPOCH = 400
+EPOCH = 200
 BATCH_SIZE = 64
 DEV_RATIO = 0.1
 DROPOUT = 0.5
@@ -157,11 +157,12 @@ for train_iter, dev_iter in train_dev_iter:
             best_dev_acc = dev_acc
             best_dev_loss = dev_loss
             no_up = 0
+        '''
         else:
             no_up += 1
             if no_up >= 10:
                 break
-    
+        '''
     cur_cv += 1
     best_dev_acc_list.append(best_dev_acc)
     best_dev_loss_list.append(best_dev_loss)
