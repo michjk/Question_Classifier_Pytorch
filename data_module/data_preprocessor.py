@@ -193,9 +193,7 @@ class FAQ(data.Dataset):
         if examples is None:
             path = self.dirname if path is None else path
             examples = []
-            questions, labels = load_data_and_labels_highest_freq_clustered(path, 20)
-            len_questions = len(questions)
-
+            
             '''for i in range(len_questions):
                 examples.append(data.Example.fromlist([questions[i], labels[i]], fields))
             '''
@@ -205,7 +203,6 @@ class FAQ(data.Dataset):
                     x = " ".join(tmp[1:])
                     x = clean_str(x)
                     y = tmp[0]
-                    questions.append(x)
                     examples.append(data.Example.fromlist([x, y], fields))
         
         super().__init__(examples, fields, **kwargs)
