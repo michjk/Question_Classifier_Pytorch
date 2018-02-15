@@ -11,6 +11,7 @@ class LSTMClassifier(nn.Module):
         super().__init__()
         self.hidden_dim = hidden_dim
         self.batch_size = batch_size
+        self.num_layers = num_layers
         self.word_embeddings = nn.Embedding(vocab_size, embedding_dim)
         self.lstm = nn.LSTM(embedding_dim, hidden_dim, dropout=dropout, num_layers=num_layers)
         self.dropout = nn.Dropout(dropout)
@@ -23,8 +24,8 @@ class LSTMClassifier(nn.Module):
         """
         # the first is the hidden h
         # the second is the cell  c
-        return (autograd.Variable(torch.zeros(1, self.batch_size, self.hidden_dim).cuda()),
-                autograd.Variable(torch.zeros(1, self.batch_size, self.hidden_dim)).cuda())
+        return (autograd.Variable(torch.zeros(self.num_layers, self.batch_size, self.hidden_dim).cuda()),
+                autograd.Variable(torch.zeros(self.num_layers, self.batch_size, self.hidden_dim)).cuda())
     
     def forward(self, sentence):
         embeds = self.word_embeddings(sentence)

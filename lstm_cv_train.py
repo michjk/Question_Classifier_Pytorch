@@ -46,7 +46,7 @@ RESULT_PATH = "runs/runs_" + current_branch + "_" + time.strftime("%a_%d_%b_%Y_%
 
 EMBEDDING_DIM = 300
 HIDDEN_DIM = 256
-LAYERS_NUM = 1
+LAYERS_NUM = 2
 EPOCH = 200
 BATCH_SIZE = 64
 DEV_RATIO = 0.1
