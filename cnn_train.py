@@ -24,10 +24,10 @@ import datetime
 
 import git
 
-np.random.seed(200)
-torch.manual_seed(200)
-torch.cuda.manual_seed_all(200)
-random.seed(200)
+np.random.seed(1)
+torch.manual_seed(1)
+torch.cuda.manual_seed_all(1)
+random.seed(1)
 
 DATASET_FOLDER = os.path.join("..", "dataset")
 DATASET_PATH = os.path.join(DATASET_FOLDER, "faqs", "faq_ntu_prototype_v6.txt")
@@ -90,7 +90,9 @@ def train_epoch(model, train_iter, loss_function, optimizer, text_field, label_f
     pred_res = []
     for batch in train_iter:
         sent, label = batch.text, batch.label
+        print(sent.shape)
         sent.data.t_()
+        print(sent.shape)
         label.data.sub_(1)
         truth_res += list(label.data)
         pred = model(sent)
