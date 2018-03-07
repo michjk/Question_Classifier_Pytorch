@@ -7,29 +7,42 @@ import torchqrnn.forget_mult
 from torchqrnn import QRNN
 
 class QRNNClassifier(nn.Module):
-    def __init__(self, embedding_dim, hidden_dim, vocab_size, label_size, batch_size, num_layers = 1, dropout = 0, zoneout = 0, window = 1, save_prev_x = False):
+    def __init__(self, embedding_dim, hidden_dim, vocab_size, label_size, batch_size, num_layers = 1, dropout = 0, zoneout = 0, window = 1, save_prev_x = False, use_gpu=True):
+        """
+        Create QRNN classification module
+        """
         super().__init__()
+        
+        #initialize properties
         self.hidden_dim = hidden_dim
         self.batch_size = batch_size
         self.num_layers = num_layers
+        self.use_gpu = use_gpu
+        
+        #create nn module
         self.word_embeddings = nn.Embedding(vocab_size, embedding_dim)
         self.qrnn = QRNN(embedding_dim, hidden_dim, dropout=dropout, zoneout=zoneout, window = window, save_prev_x = save_prev_x, num_layers=num_layers)
         self.dropout = nn.Dropout(dropout)
         self.hidden_to_label = nn.Linear(hidden_dim, label_size)
-        self.hidden = self.init_hidden()
+        self.init_hidden()
+        if use_gpu:
+            self.cuda()
     
     def init_hidden(self):
         """
-        Initialize weight of hidden
+        Initialize weight of hidden state
         """
-        # the first is the hidden h
-        # the second is the cell  c
-        return autograd.Variable(torch.zeros(self.num_layers, self.batch_size, self.hidden_dim).cuda())
+        self.hidden = autograd.Variable(torch.zeros(self.num_layers, self.batch_size, self.hidden_dim))
+        if self.use_gpu:
+            self.hidden.cuda()
     
     def reset(self):
         self.qrnn.reset()
     
     def forward(self, sentence):
+        self.batch_size = sentence.data.shape[1]
+        self.init_hidden()
+        
         embeds = self.word_embeddings(sentence)
         x = embeds.view(len(sentence), self.batch_size, -1)
         out, self.hidden = self.qrnn(x, self.hidden)
@@ -37,5 +50,3 @@ class QRNNClassifier(nn.Module):
         y = self.hidden_to_label(out[-1])
         log_probs = F.log_softmax(y)
         return log_probs
-
-
