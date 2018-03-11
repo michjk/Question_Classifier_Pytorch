@@ -1,53 +1,38 @@
 import os
-from data_module.data_output import * 
+from data_module.data_writer import * 
 import shutil
 import torch
 
 class ModelRunner:
-    def __init__(self, model, epochs, loss_function, optimizer, transpose = False, saved_model_folder_path = 'best_model', saved_model_name = 'best_model.model', log_folder_path = 'log', train_log_folder_name='train_log', dev_log_folder_name='test_log'):
+    def __init__(self, model, epochs, loss_function, optimizer, learning_logger, transpose = False):
         self.model = model
         self.epochs = epochs
         self.loss_function = loss_function
         self.optimizer = optimizer
         self.transpose = transpose
-
-        self.train_log_folder_path = os.path.join(log_folder_path, train_log_folder_name)
-        self.dev_log_folder_path = os.path.join(log_folder_path, dev_log_folder_name)
-        
-        self.saved_model_folder_path = saved_model_folder_path
-        self.saved_model_file_path = os.path.join(saved_model_folder_path, saved_model_name)
+        self.learning_logger = learning_logger
 
     def learn(self, train_iter, dev_iter):
         best_dev_acc = 0
-        
-        if os.path.exists(self.saved_model_folder_path):
-            shutil.rmtree(self.saved_model_folder_path)
-        os.makedirs(self.saved_model_folder_path)
-        
-        if os.path.exists(self.train_log_folder_path):
-            shutil.rmtree(self.train_log_folder_path)
-        if os.path.exists(self.dev_log_folder_path):
-            shutil.rmtree(self.dev_log_folder_path)
-        print(self.train_log_folder_path)
-        print(self.dev_log_folder_path)
-        train_logger = PlotLogger(self.train_log_folder_path)
-        dev_logger = PlotLogger(self.dev_log_folder_path)
 
+        self.learning_logger.initialize()
         for i in range(self.epochs):
             print('epoch: %d start!' % i)
-            self.learn_epoch(train_iter, i, train_logger)
+            self.learn_epoch(train_iter, i)
             
             print('now best dev acc:',best_dev_acc)
-            dev_acc = self.evaluate(dev_iter, i, dev_logger)
+            dev_acc = self.evaluate(dev_iter, i)
             
             if dev_acc > best_dev_acc:
                 best_dev_acc = dev_acc
+                """ 
                 if os.path.exists(self.saved_model_file_path):
                     os.remove(self.saved_model_file_path)
+                """
                 print('New Best Dev!!!')
-                torch.save(self.model.state_dict(), self.saved_model_file_path)
+                self.learning_logger.save_model(self.model)
     
-    def learn_epoch(self, train_iter, i, logger):
+    def learn_epoch(self, train_iter, i):
         self.model.train()
         
         avg_loss = 0.0
@@ -75,10 +60,10 @@ class ModelRunner:
         avg_loss /= len(train_iter)
         acc = self.get_accuracy(truth_res,pred_res)
         print('epoch: %d done!\ntrain avg_loss:%g , acc:%g'%(i, avg_loss, acc))
-        logger.log_value("accuracy", acc, i)
-        logger.log_value("loss", avg_loss, i)
+        self.learning_logger.train_log_value("accuracy", acc, i)
+        self.learning_logger.train_log_value("loss", avg_loss, i)
 
-    def evaluate(self, eval_iter, i, logger):
+    def evaluate(self, eval_iter, i):
         self.model.eval()
         
         avg_loss = 0.0
@@ -100,8 +85,8 @@ class ModelRunner:
         avg_loss /= len(eval_iter)
         acc = self.get_accuracy(truth_res, pred_res)
         print('dev avg_loss:%g train acc:%g' % (avg_loss, acc))
-        logger.log_value("accuracy", acc, i)
-        logger.log_value("loss", avg_loss, i)
+        self.learning_logger.dev_log_value("accuracy", acc, i)
+        self.learning_logger.dev_log_value("loss", avg_loss, i)
         return acc
     
     def get_accuracy(self, truth, pred):

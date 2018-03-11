@@ -3,14 +3,20 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class  CNNClassifier(nn.Module):  
-    def __init__(self, embedding_dim, vocab_size, label_size, batch_size, kernel_num, kernel_sizes, dropout = 0.5):
+    def __init__(self, embedding_dim, vocab_size, label_size, kernel_num, kernel_sizes, pretrained_embedding_weight = None, train_embedding_layer = True, dropout = 0, use_gpu = True):
         super().__init__()
         
+        if isinstance(kernel_sizes, str):
+            kernel_sizes = [int(i) for i in kernel_sizes.split(',')]
+
         self.word_embeddings = nn.Embedding(vocab_size, embedding_dim)
         self.convs1 = nn.ModuleList([nn.Conv2d(1, kernel_num, (K, embedding_dim)) for K in kernel_sizes])
         self.dropout = nn.Dropout(dropout)
         self.fc1 = nn.Linear(len(kernel_sizes)*kernel_num, label_size)
 
+        if use_gpu:
+            self.cuda()
+        
     def forward(self, x):
 
         x = self.word_embeddings(x) # (N,W,D)
