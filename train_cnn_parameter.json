@@ -10,11 +10,13 @@
     "dev_ratio": 0.1,
     "learning_rate": 1e-3,
     "transpose": true,
-    "max_text_length": null,
+    "max_text_length": 81,
     "dataset_path": "../dataset/faqs/faq_ntu_prototype_v6.txt",
     "use_git": true,
     "result_folder_path": "runs",
     "saved_model_file_path": "best_model/faq_best_model.model",
     "train_log_folder_path": "summaries/train",
-    "dev_log_folder_path": "summaries/dev"
+    "dev_log_folder_path": "summaries/dev",
+    "pretrained_word_embedding_name": "glove.6B.300d",
+    "pretrained_word_embedding_path": "../dataset/GoogleNews-vectors-negative300.bin"
 }
