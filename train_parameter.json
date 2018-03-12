@@ -2,7 +2,7 @@
     "embedding_dim": 300,
     "hidden_dim": 256,
     "layers_num": 1,
-    "dropout": 0.5,
+    "dropout": 0.7,
     "zoneout": 0.5,
     "window": 2,
     "save_prev_x": false,
