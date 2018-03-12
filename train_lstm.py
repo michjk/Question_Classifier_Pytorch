@@ -7,7 +7,7 @@ import torch.autograd as autograd
 import torch.nn as nn
 import torch.optim as optim
 
-from model_module.qrnn_classifier import QRNNClassifier
+from model_module.lstm_classifier import LSTMClassifier
 
 from data_module.data_preprocessor import *
 
@@ -40,7 +40,7 @@ train_iter, dev_iter, vocab_size, label_size, pretrained_embedding_weight = load
     parameter.dataset_path, parameter.batch_size, parameter.max_text_length, parameter.embedding_dim, dev_ratio = parameter.dev_ratio, pretrained_word_embedding_name = parameter.pretrained_word_embedding_name, pretrained_word_embedding_path = parameter.pretrained_word_embedding_path, use_gpu = parameter.use_gpu
     )
 
-model = QRNNClassifier(**qrnn_parameter, vocab_size=vocab_size,label_size=label_size, pretrained_embedding_weight=pretrained_embedding_weight)
+model = LSTMClassifier(**qrnn_parameter, vocab_size=vocab_size,label_size=label_size, pretrained_embedding_weight=pretrained_embedding_weight)
 
 loss_function = nn.NLLLoss()
 update_parameter = filter(lambda p: p.requires_grad, model.parameters())

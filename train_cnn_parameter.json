@@ -1,0 +1,20 @@
+{
+    "embedding_dim": 300,
+    "dropout": 0.5,
+    "train_embedding_layer": false,
+    "kernel_num": 1,
+    "kernel_sizes": "3, 4, 5",
+    "use_gpu": true,
+    "epoch": 10,
+    "batch_size": 32,
+    "dev_ratio": 0.1,
+    "learning_rate": 1e-3,
+    "transpose": true,
+    "max_text_length": null,
+    "dataset_path": "../dataset/faqs/faq_ntu_prototype_v6.txt",
+    "use_git": true,
+    "result_folder_path": "runs",
+    "saved_model_file_path": "best_model/faq_best_model.model",
+    "train_log_folder_path": "summaries/train",
+    "dev_log_folder_path": "summaries/dev"
+}

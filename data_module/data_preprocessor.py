@@ -9,6 +9,10 @@ import codecs
 
 from sklearn.model_selection import KFold
 
+from utils import dotdict
+
+import torchwordemb
+
 label_place= set(['New_York_City', 'New_Haven,_Connecticut', 'Portugal', 'Southampton'])
 label_event = set(['American_Idol', '2008_Sichuan_earthquake', '2008_Summer_Olympics_torch_relay', 'The_Blitz'])
 label_person = set(['Beyonce', 'Frederic_Chopin', 'Queen_Victoria', 'Muammar_Gaddafi', 'Napoleon', 'Gamal_Abdel_Nasser', 'Dwight_D._Eisenhower', 'Kanye_West'])
@@ -179,7 +183,7 @@ class SQuAD(data.Dataset):
 
 class FAQ(data.Dataset):
     def __init__(self, text_field, label_field, path=None, examples=None, **kwargs):
-        """Create an MR dataset instance given a path and fields.
+        """Create an FAQ dataset instance given a path and fields.
         Arguments:
             text_field: The field that will be used for text data.
             label_field: The field that will be used for label data.
@@ -194,9 +198,6 @@ class FAQ(data.Dataset):
             path = self.dirname if path is None else path
             examples = []
             
-            '''for i in range(len_questions):
-                examples.append(data.Example.fromlist([questions[i], labels[i]], fields))
-            '''
             with codecs.open(path,'r','utf8') as f:
                 for line in f:
                     tmp = line.split()
@@ -249,6 +250,7 @@ class FAQ(data.Dataset):
         print('train:',len(train_data[0].examples),'test:',len(test_examples), 'dev:', len(dev_data[0].examples))
 
         return (train_data, dev_data, test_data)
+
 
 def load_iter(text_field, label_field, batch_size, path, dev_ratio, cpu = None):
     print('loading data')
@@ -306,3 +308,49 @@ class QuestionWrapper(data.Dataset):
 
         super().__init__(examples, fields, **kwargs)
 
+def tokenizer(text): # create a tokenizer function
+    text = text.lower()
+    tokenizer_re = re.compile(r"[A-Z]{2,}(?![a-z])|[A-Z][a-z]+(?=[A-Z])|[\'\w\-]+", re.UNICODE) 
+    return tokenizer_re.findall(text)
+
+def load_dataset(path, batch_size, max_text_length, embedding_dim, tokenizer = tokenizer, dev_ratio = 0.1, pretrained_word_embedding_name = "glove.6B.300d", pretrained_word_embedding_path = None, use_gpu = True):
+    text_field = data.Field(lower=True, tokenize=tokenizer, fix_length=max_text_length)
+    label_field = data.Field(sequential=False)
+
+    print('loading data')
+    train_data, dev_data = FAQ.splits(text_field, label_field, path, dev_ratio)
+
+    print('building vocab')
+    text_field.build_vocab(train_data, dev_data)
+    label_field.build_vocab(train_data, dev_data)
+
+    print("batching")
+    cpu = -1
+    if use_gpu:
+        cpu = None
+    
+    train_iter, dev_iter = data.Iterator.splits(
+        (train_data, dev_data), batch_sizes=(batch_size, len(dev_data)),
+        repeat=False, device = cpu, shuffle = True
+    )
+
+    vectors = None
+
+    if pretrained_word_embedding_name == "word2vec":
+        vocab, vec = torchwordemb.load_word2vec_bin(pretrained_word_embedding_path)
+        text_field.vocab.set_vectors(vocab, vec, embedding_dim)
+        vectors = text_field.vocab.vectors
+    elif "glove" in pretrained_word_embedding_name:
+        text_field.vocab.load_vectors(pretrained_word_embedding_name)
+        vectors = text_field.vocab.vectors
+    
+    vocab_size = len(text_field.vocab)
+    #from zero
+    label_size = len(label_field.vocab) - 1
+
+    return train_iter, dev_iter, vocab_size, label_size, vectors
+
+
+
+
+    

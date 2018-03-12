@@ -25,10 +25,6 @@ class ModelRunner:
             
             if dev_acc > best_dev_acc:
                 best_dev_acc = dev_acc
-                """ 
-                if os.path.exists(self.saved_model_file_path):
-                    os.remove(self.saved_model_file_path)
-                """
                 print('New Best Dev!!!')
                 self.learning_logger.save_model(self.model)
     
