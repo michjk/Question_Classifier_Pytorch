@@ -33,7 +33,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--path", help="path parameter json file")
 param_json_path = parser.parse_args().path
 
-parameter = load_parameters_from_json("train_parameter.json")
+parameter = load_parameters_from_json(param_json_path)
 qrnn_parameter = filter_dotdict_class_propoperty(parameter, CNNClassifier)
 
 train_iter, dev_iter, vocab_size, label_size, pretrained_embedding_weight = load_dataset(
