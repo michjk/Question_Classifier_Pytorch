@@ -202,7 +202,7 @@ class FAQ(data.Dataset):
                 for line in f:
                     tmp = line.split()
                     x = " ".join(tmp[1:])
-                    x = clean_str(x)
+                    #x = clean_str(x)
                     y = tmp[0]
                     examples.append(data.Example.fromlist([x, y], fields))
         
@@ -309,7 +309,8 @@ class QuestionWrapper(data.Dataset):
         super().__init__(examples, fields, **kwargs)
 
 def tokenizer(text): # create a tokenizer function
-    text = text.lower()
+    text = clean_str(text)
+    #tokenizer from tensorflow.preprocessing library  
     tokenizer_re = re.compile(r"[A-Z]{2,}(?![a-z])|[A-Z][a-z]+(?=[A-Z])|[\'\w\-]+", re.UNICODE) 
     return tokenizer_re.findall(text)
 
@@ -333,7 +334,7 @@ def load_dataset(path, batch_size, max_text_length, embedding_dim, tokenizer = t
         (train_data, dev_data), batch_sizes=(batch_size, len(dev_data)),
         repeat=False, device = cpu, shuffle = True
     )
-
+    
     vectors = None
 
     if pretrained_word_embedding_name == "word2vec":
@@ -345,6 +346,7 @@ def load_dataset(path, batch_size, max_text_length, embedding_dim, tokenizer = t
         vectors = text_field.vocab.vectors
     
     vocab_size = len(text_field.vocab)
+    print("vocab size ", vocab_size)
     #from zero
     label_size = len(label_field.vocab) - 1
 
