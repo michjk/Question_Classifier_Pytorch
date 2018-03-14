@@ -14,6 +14,8 @@ class ModelRunner:
 
     def learn(self, train_iter, dev_iter):
         best_dev_acc = 0
+        best_truth_res = []
+        best_pred_res = []
 
         self.learning_logger.initialize()
         for i in range(self.epochs):
@@ -21,12 +23,16 @@ class ModelRunner:
             self.learn_epoch(train_iter, i)
             
             print('now best dev acc:',best_dev_acc)
-            dev_acc = self.evaluate(dev_iter, i)
+            dev_acc, truth_res, pred_res = self.evaluate(dev_iter, i)
             
             if dev_acc > best_dev_acc:
                 best_dev_acc = dev_acc
                 print('New Best Dev!!!')
                 self.learning_logger.save_model(self.model)
+                best_truth_res = truth_res
+                best_pred_res = pred_res
+        
+        self.learning_logger.save_confusion_matrix(best_truth_res, best_pred_res)
     
     def learn_epoch(self, train_iter, i):
         self.model.train()
@@ -83,7 +89,8 @@ class ModelRunner:
         print('dev avg_loss:%g train acc:%g' % (avg_loss, acc))
         self.learning_logger.dev_log_value("accuracy", acc, i)
         self.learning_logger.dev_log_value("loss", avg_loss, i)
-        return acc
+ 
+        return acc, truth_res, pred_res
     
     def get_accuracy(self, truth, pred):
         assert len(truth)==len(pred)

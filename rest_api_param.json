@@ -2,7 +2,8 @@
     "use_gpu": true,
     "transpose": false,
     "saved_model_file_path": "runs/refactor_Tue_13_Mar_2018_17_58/best_model/faq_best_model.model",
-    "log_file_path": "rest_api_logging.log",
+    "debug_log_file_path": "rest_api_debug.log",
+    "error_log_file_path": "rest_api_error.log",
     "text_vocab_path": "text_vocab.pkl", 
     "label_vocab_path": "label_vocab.pkl"
 }

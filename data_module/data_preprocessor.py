@@ -240,6 +240,30 @@ class QuestionWrapper(data.Dataset):
 
         super().__init__(examples, fields, **kwargs)
 
+def preprocess_question(question, text_field, transpose = False, use_gpu = False):
+    device = -1
+    if use_gpu:
+        device = None
+    question_data = QuestionWrapper(text_field, question)
+    _, question_iter = data.Iterator.splits(
+        (question_data, question_data), batch_size=len(question_data),
+        repeat=False, device = device
+    )
+
+    for batch in question_iter:
+        text = batch.text
+        if transpose:
+            text.data.t_()
+
+        return text
+
+def get_label(label_tensor, label_field):
+    pred_index = label_tensor.data.max(1)[1]
+    pred_index = pred_index.cpu().numpy()[0]
+    label_string = label_field.vocab.itos[pred_index+1]
+
+    return label_string
+
 def tokenizer(text): # create a tokenizer function
     text = clean_str(text)
     #tokenizer from tensorflow.preprocessing library  
@@ -267,17 +291,6 @@ def load_dataset(train_path, dev_path, batch_size, max_text_length, embedding_di
     print('loading data')
     train_data = data.TabularDataset(path=train_path, format='csv', skip_header=True, fields=[("text", text_field), ('label', label_field)])
     dev_data = data.TabularDataset(path=dev_path, format='csv', skip_header=True, fields=[("text", text_field), ('label', label_field)])
-    
-    '''
-    examples = all_data.examples
-    np.random.shuffle(examples)
-    test_length = -1*int(dev_ratio*float(len(examples)))
-    train_data, dev_data = examples[:test_length], examples[test_length:]
-    
-    train_data = CustomDataset(train_data, [("text", text_field), ("label", label_field)])
-    dev_data = CustomDataset(dev_data, [("text", text_field), ("label", label_field)])
-    '''
-    #train_data, dev_data = FAQ.splits(text_field, label_field, path, dev_ratio)
 
     print('building vocab')
     text_field.build_vocab(train_data, dev_data)
@@ -311,7 +324,7 @@ def load_dataset(train_path, dev_path, batch_size, max_text_length, embedding_di
     #from zero
     label_size = len(label_field.vocab) - 1
 
-    return train_iter, dev_iter, vocab_size, label_size, vectors
+    return train_iter, dev_iter, vocab_size, label_size, label_field.vocab.itos, vectors
 
 
 

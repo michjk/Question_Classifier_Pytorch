@@ -20,6 +20,7 @@
     "saved_model_file_path": "best_model/faq_best_model.model",
     "train_log_folder_path": "summaries/train",
     "dev_log_folder_path": "summaries/dev",
+    "confusion_matrix_folder_path": "summaries/confusion_matrix",
     "pretrained_word_embedding_name": "glove.6B.300d",
     "pretrained_word_embedding_path": "../dataset/GoogleNews-vectors-negative300.bin"
 }
