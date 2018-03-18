@@ -270,19 +270,7 @@ def tokenizer(text): # create a tokenizer function
     tokenizer_re = re.compile(r"[A-Z]{2,}(?![a-z])|[A-Z][a-z]+(?=[A-Z])|[\'\w\-]+", re.UNICODE) 
     return tokenizer_re.findall(text)
 
-class CustomDataset(data.Dataset):
-    def __init__(self, examples, fields, **kwargs):
-        super().__init__(examples, fields, **kwargs)
-    
-    @staticmethod
-    def sort_key(ex):
-        return len(ex.text)
-
-def sort_key(ex):
-    return len(ex.text)
-
-def load_dataset(train_path, dev_path, batch_size, max_text_length, embedding_dim, tokenizer = tokenizer,
-    sort_key = sort_key, dev_ratio = 0.1, pretrained_word_embedding_name = "glove.6B.300d", pretrained_word_embedding_path = None,
+def load_dataset(train_path, dev_path, max_text_length, embedding_dim, tokenizer = tokenizer, dev_ratio = 0.1, pretrained_word_embedding_name = "glove.6B.300d", pretrained_word_embedding_path = None,
     saved_text_vocab_path = "text_vocab.pkl", saved_label_vocab_path = "label_vocab.pkl",
     use_gpu = True):
     text_field = data.Field(lower=True, tokenize=tokenizer, fix_length=max_text_length)
@@ -291,21 +279,17 @@ def load_dataset(train_path, dev_path, batch_size, max_text_length, embedding_di
     print('loading data')
     train_data = data.TabularDataset(path=train_path, format='csv', skip_header=True, fields=[("text", text_field), ('label', label_field)])
     dev_data = data.TabularDataset(path=dev_path, format='csv', skip_header=True, fields=[("text", text_field), ('label', label_field)])
-
+    
     print('building vocab')
     text_field.build_vocab(train_data, dev_data)
     label_field.build_vocab(train_data, dev_data)
-
-    print("batching")
-    cpu = -1
-    if use_gpu:
-        cpu = None
     
+    '''
     train_iter, dev_iter = data.Iterator.splits(
         (train_data, dev_data), batch_sizes=(batch_size, len(dev_data)),
         repeat=False, device = cpu, shuffle = True, sort_key = sort_key
     )
-
+    '''
     vectors = None
 
     if pretrained_word_embedding_name == "word2vec":
@@ -324,7 +308,7 @@ def load_dataset(train_path, dev_path, batch_size, max_text_length, embedding_di
     #from zero
     label_size = len(label_field.vocab) - 1
 
-    return train_iter, dev_iter, vocab_size, label_size, label_field.vocab.itos, vectors
+    return train_data, dev_data, vocab_size, label_size, label_field.vocab.itos, vectors
 
 
 

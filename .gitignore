@@ -117,3 +117,6 @@ best_models/
 
 #.data
 .data/
+
+#.pkl
+*.pkl

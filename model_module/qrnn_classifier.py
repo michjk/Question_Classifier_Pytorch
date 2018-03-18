@@ -17,10 +17,13 @@ class QRNNClassifier(nn.Module):
         self.hidden_dim = hidden_dim
         self.num_layers = num_layers
         self.use_gpu = use_gpu
+        self.use_pretrained_word_embedding = not (pretrained_embedding_weight is None)
+        self.train_embedding_layer = train_embedding_layer
+        self.pretrained_embedding_weight = pretrained_embedding_weight
 
         #create nn module
         self.word_embeddings = nn.Embedding(vocab_size, embedding_dim)
-        if not (pretrained_embedding_weight is None):
+        if self.use_pretrained_word_embedding:
             self.word_embeddings.weight.data = pretrained_embedding_weight
             self.word_embeddings.weight.requires_grad = train_embedding_layer
         self.qrnn = QRNN(embedding_dim, hidden_dim, dropout=dropout, zoneout=zoneout, window = window, save_prev_x = save_prev_x, num_layers=num_layers)

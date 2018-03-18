@@ -38,7 +38,7 @@ class LearningLogger:
 
     def initialize(self):
         if os.path.exists(self.result_path):
-            shutil.rmtree(self.result_path, exist_ok = True)
+            shutil.rmtree(self.result_path, ignore_errors=True)
             print("path erased")
 
         os.makedirs(self.result_path, exist_ok=True)
@@ -54,11 +54,9 @@ class LearningLogger:
 
     def train_log_value(self, name, value, step):
         self.train_logger.log_value(name, value, step)
-        print("train log saved at", self.train_log_folder_path)
     
     def dev_log_value(self, name, value, step):
         self.dev_logger.log_value(name, value, step)
-        print("dev log saved at", self.dev_log_folder_path)
     
     def save_model(self, model):
         torch.save(model, self.saved_model_file_path)

@@ -11,7 +11,7 @@ class dotdict(dict):
 
 def filter_dotdict_class_propoperty(dotdict_object, class_blueprint):
     varnames = class_blueprint.__init__.__code__.co_varnames
-    new_dotdict = {k:v for (k, v) in dotdict_object.items() if k in varnames}
+    new_dotdict = dotdict({k:v for (k, v) in dotdict_object.items() if k in varnames})
     return new_dotdict
 
 def load_parameter_from_json(path):
@@ -32,3 +32,12 @@ def load_rest_api_parameter_from_json(path):
     dotdict_object = dotdict(json_object)
 
     return dotdict_object
+
+class FactoryClass:
+    def __init__(self, class_contructor, param_dict = {}):
+        self.class_contructor = class_contructor
+        self.param_dict = param_dict
+    
+    def create_class(self, new_param_dict={}):
+        new_object = self.class_contructor(**self.param_dict, **new_param_dict)
+        return new_object
