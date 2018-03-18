@@ -49,7 +49,7 @@ model_factory = FactoryClass(QRNNClassifier, qrnn_parameter)
 
 loss_factory = FactoryClass(nn.NLLLoss)
 
-optimizer_param_dict = {'lr': param.learning_rate}
+optimizer_param_dict = filter_dotdict_class_propoperty(param, optim.Adam)
 optimizer_factory = FactoryClass(optim.Adam, optimizer_param_dict)
 
 #optimizer = optim.Adagrad(update_parameter, lr=1e-3)
@@ -60,4 +60,3 @@ model_runner = ModelRunner(model_factory, loss_factory, optimizer_factory, param
 start_time = time.time()
 model_runner.learn_cv(train_data, dev_data, param.n_folds)
 print("Overall time elapsed {} sec".format(time.time() - start_time))
-

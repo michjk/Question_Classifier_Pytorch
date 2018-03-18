@@ -18,7 +18,7 @@ import datetime
 
 from model_module.model_runner import ModelRunner
 
-from utils import load_parameter_from_json, filter_dotdict_class_propoperty
+from utils import load_parameter_from_json, filter_dotdict_class_propoperty, FactoryClass
 
 from data_module.data_writer import LearningLogger
 
@@ -36,23 +36,27 @@ param_json_path = parser.parse_args().path
 param = load_parameter_from_json(param_json_path)
 lstm_parameter = filter_dotdict_class_propoperty(param, LSTMClassifier)
 
-train_iter, dev_iter, vocab_size, label_size, label_map, pretrained_embedding_weight = load_dataset(
-    param.train_dataset_path, param.dev_dataset_path, param.batch_size, param.max_text_length, param.embedding_dim, 
-    pretrained_word_embedding_name = param.pretrained_word_embedding_name, pretrained_word_embedding_path = param.pretrained_word_embedding_path, 
-    use_gpu = param.use_gpu
-    )
+train_data, dev_data, vocab_size, label_size, label_map, pretrained_embedding_weight = load_dataset(
+    param.train_dataset_path, param.dev_dataset_path, param.max_text_length, param.embedding_dim, 
+    pretrained_word_embedding_name = param.pretrained_word_embedding_name, pretrained_word_embedding_path = param.pretrained_word_embedding_path
+)
 
-model = LSTMClassifier(**lstm_parameter, vocab_size=vocab_size,label_size=label_size, pretrained_embedding_weight=pretrained_embedding_weight)
+lstm_parameter.vocab_size = vocab_size
+lstm_parameter.label_size = label_size
+lstm_parameter.pretrained_embedding_weight = pretrained_embedding_weight
 
-loss_function = nn.NLLLoss()
-update_parameter = filter(lambda p: p.requires_grad, model.parameters())
-optimizer = optim.Adam(update_parameter, lr = param.learning_rate)
+model_factory = FactoryClass(LSTMClassifier, lstm_parameter)
+
+loss_factory = FactoryClass(nn.NLLLoss)
+
+optimizer_param_dict = filter_dotdict_class_propoperty(param, optim.Adam)
+optimizer_factory = FactoryClass(optim.Adam, optimizer_param_dict)
+
 #optimizer = optim.Adagrad(update_parameter, lr=1e-3)
 #optimizer = optim.RMSprop(update_parameter, lr=parameter.learning_rate, alpha=0.99, eps=1e-8, weight_decay=5e-4)
 
 learning_logger = LearningLogger(label_map, param.result_folder_path, param.saved_model_file_path, param.train_log_folder_path, param.dev_log_folder_path, param.confusion_matrix_folder_path)
-mode_runner = ModelRunner(model, param.epoch, loss_function, optimizer, learning_logger,  param.transpose)
+model_runner = ModelRunner(model_factory, loss_factory, optimizer_factory, param.epoch, param.batch_size, learning_logger, param.transpose, param.use_gpu)
 start_time = time.time()
-mode_runner.learn(train_iter, dev_iter)
+model_runner.learn(train_data, dev_data)
 print("Overall time elapsed {} sec".format(time.time() - start_time))
-

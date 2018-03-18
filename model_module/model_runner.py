@@ -111,16 +111,16 @@ class ModelRunner:
             train_iter = self.get_iterator(train_data_fold, self.batch_size)
             val_iter = self.get_iterator(val_data_fold, len(val_data_fold), train=False)
             for i in range(self.epochs):
-                #print('epoch: %d start!' % i)
+                print('epoch: %d start!' % i)
                 self.learn_epoch(train_iter, i, cv=True)
                 
-                #print('now best dev acc:',best_val_acc)
+                print('now best dev acc:',best_val_acc)
                 val_acc, val_loss, truth_res, pred_res = self.evaluate(val_iter, i, cv=True)
                 
                 if val_acc > best_val_acc:
                     best_val_acc = val_acc
                     best_val_loss = val_loss
-                    #print('New Best Dev!!!')
+                    print('New Best Dev!!!')
                     best_truth_res = truth_res
                     best_pred_res = pred_res
             print("best val acc: ", best_val_acc)
@@ -145,9 +145,6 @@ class ModelRunner:
         
         for batch in train_iter:
             sent, label = batch.text, batch.label
-            if count == 0:
-                print('train')
-                print(sent)
             if self.transpose:
                 sent.data.t_()
             label.data.sub_(1)
@@ -159,15 +156,15 @@ class ModelRunner:
             loss = self.loss_function(pred, label)
             avg_loss += loss.data[0]
             count += 1
-            '''
+            
             if count % 100 == 0:
                 print('epoch: %d iterations: %d loss :%g' % (i, count*model.batch_size, loss.data[0]))
-            '''
+            
             loss.backward()
             self.optimizer.step()
         avg_loss /= len(train_iter)
         acc = self.get_accuracy(truth_res,pred_res)
-        #print('epoch: %d done!\ntrain avg_loss:%g , acc:%g'%(i, avg_loss, acc))
+        print('epoch: %d done!\ntrain avg_loss:%g , acc:%g'%(i, avg_loss, acc))
 
         if not cv:
             self.learning_logger.train_log_value("accuracy", acc, i)

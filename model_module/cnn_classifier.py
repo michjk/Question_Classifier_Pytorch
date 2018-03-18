@@ -10,6 +10,10 @@ class  CNNClassifier(nn.Module):
             kernel_sizes = [int(i) for i in kernel_sizes.split(',')]
 
         self.word_embeddings = nn.Embedding(vocab_size, embedding_dim)
+        if not (pretrained_embedding_weight is None):
+            print("pretrain")
+            self.word_embeddings.weight.data = pretrained_embedding_weight
+            self.word_embeddings.weight.requires_grad = train_embedding_layer
         self.convs1 = nn.ModuleList([nn.Conv2d(1, kernel_num, (K, embedding_dim)) for K in kernel_sizes])
         self.dropout = nn.Dropout(dropout)
         self.fc1 = nn.Linear(len(kernel_sizes)*kernel_num, label_size)
