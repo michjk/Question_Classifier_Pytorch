@@ -54,7 +54,7 @@ class ModelRunner:
     
     def learn(self, train_data, dev_data):
         best_dev_acc = 0
-        best_dev_loss = 0
+        best_dev_loss = None
         best_truth_res = []
         best_pred_res = []
         
@@ -77,7 +77,7 @@ class ModelRunner:
             print('now best dev acc:',best_dev_acc)
             dev_acc, dev_loss, truth_res, pred_res = self.evaluate(dev_iter, i)
             
-            if dev_acc > best_dev_acc:
+            if best_dev_loss is None or dev_loss < best_dev_loss:
                 best_dev_acc = dev_acc
                 best_dev_loss = dev_loss
                 print('New Best Dev!!!')
@@ -85,6 +85,8 @@ class ModelRunner:
                 best_truth_res = truth_res
                 best_pred_res = pred_res
         
+        print("best model accuracy: ", best_dev_acc)
+        print("best model error: ", best_dev_loss)
         self.learning_logger.save_confusion_matrix(best_truth_res, best_pred_res)
     
     def learn_cv(self, train_data, test_data, n_folds):
@@ -103,7 +105,7 @@ class ModelRunner:
             
             print("Fold: ", fold)
             best_val_acc = 0.0
-            best_val_loss = 0.0
+            best_val_loss = None
             
             best_truth_res = []
             best_pred_res = []
@@ -117,7 +119,7 @@ class ModelRunner:
                 print('now best dev acc:',best_val_acc)
                 val_acc, val_loss, truth_res, pred_res = self.evaluate(val_iter, i, cv=True)
                 
-                if val_acc > best_val_acc:
+                if best_val_loss is None or val_loss < best_val_loss:
                     best_val_acc = val_acc
                     best_val_loss = val_loss
                     print('New Best Dev!!!')
