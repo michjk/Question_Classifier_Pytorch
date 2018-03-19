@@ -45,7 +45,7 @@ cnn_parameter.vocab_size = vocab_size
 cnn_parameter.label_size = label_size
 cnn_parameter.pretrained_embedding_weight = pretrained_embedding_weight
 
-model_factory = FactoryClass(CNNClassifier, qrnn_parameter)
+model_factory = FactoryClass(CNNClassifier, cnn_parameter)
 
 loss_factory = FactoryClass(nn.NLLLoss)
 
