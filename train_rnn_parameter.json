@@ -11,6 +11,7 @@
     "epoch": 300,
     "batch_size": 64,
     "lr": 1e-3,
+    "weight_decay": 5e-4,
     "transpose": false,
     "max_text_length": null,
     "n_folds": 10,
