@@ -6,6 +6,8 @@ import sys
 import torch
 from torchtext import data
 
+import time
+
 from data_module.data_preprocessor import get_label, preprocess_question
 
 import os
@@ -68,9 +70,12 @@ def prediction():
         logger.info("Question: " + question)
         x = preprocess_question(question, text_field, transpose = param.use_gpu, use_gpu=param.use_gpu)
         model.eval()
+        t = time.time()
         y = model(x)
+        dur = time.time() - t
         label_string = get_label(y, label_field)
         logger.info("Result: " + str(label_string))
+        logger.info("Duration: " + str(dur))
         return jsonify({'result': str(label_string)})
     except:
         e = sys.exc_info()[0]
