@@ -15,6 +15,8 @@ import torchwordemb
 
 import dill as pickle
 
+import spacy
+
 label_place= set(['New_York_City', 'New_Haven,_Connecticut', 'Portugal', 'Southampton'])
 label_event = set(['American_Idol', '2008_Sichuan_earthquake', '2008_Summer_Olympics_torch_relay', 'The_Blitz'])
 label_person = set(['Beyonce', 'Frederic_Chopin', 'Queen_Victoria', 'Muammar_Gaddafi', 'Napoleon', 'Gamal_Abdel_Nasser', 'Dwight_D._Eisenhower', 'Kanye_West'])
@@ -24,6 +26,8 @@ place = "place"
 event = "event"
 person = "person"
 period = "period"
+
+spacy_nlp = spacy.load('en')
 
 def clean_str(string):
     """
@@ -183,7 +187,6 @@ class SQuAD(data.Dataset):
 
         return (train_data, dev_data, test_data)
 
-
 def load_iter(text_field, label_field, batch_size, path, dev_ratio, cpu = None):
     print('loading data')
     train_data, dev_data = FAQ.splits(text_field, label_field, path, dev_ratio)
@@ -198,38 +201,6 @@ def load_iter(text_field, label_field, batch_size, path, dev_ratio, cpu = None):
     )
 
     return train_iter, dev_iter
-
-def load_iter_cv(text_field, label_field, batch_size, path, test_ratio, n_splits):
-    print('loading data')
-    train_data, dev_data, test_data = FAQ.splits_cv(text_field, label_field, path, test_ratio, n_splits)
-
-    print(train_data[0])
-    print(dev_data[0])
-    print(test_data)
-
-    text_field.build_vocab(train_data[0], dev_data[0], test_data)
-    label_field.build_vocab(train_data[0], dev_data[0], test_data)
-
-    print("label size ", len(label_field.vocab))
-
-    print('building batches')
-
-    train_dev_iter = []
-    for i in range(len(train_data)):
-        train_iter, dev_iter = data.Iterator.splits(
-            (train_data[i], dev_data[i]), batch_sizes=(batch_size, len(dev_data[i])),
-            repeat=False, device = None
-        )
-
-        train_dev_iter.append((train_iter, dev_iter))
-    
-    print("build test")
-    _, test_iter = data.Iterator.splits(
-        (train_data[0], test_data), batch_size=len(test_data),
-        repeat=False, device = None
-    )
-
-    return train_dev_iter, test_iter
 
 class QuestionWrapper(data.Dataset):
     def __init__(self, text_field, question, **kwargs):
@@ -266,13 +237,14 @@ def get_label(label_tensor, label_field):
 
 def tokenizer(text): # create a tokenizer function
     text = clean_str(text)
-    #tokenizer from tensorflow.preprocessing library  
+    #tokenizer from tensorflow.preprocessing library
+    lemmatized = spacy_nlp(text)
+    text = ' '.join([token.lemma_ for token in lemmatized])
     tokenizer_re = re.compile(r"[A-Z]{2,}(?![a-z])|[A-Z][a-z]+(?=[A-Z])|[\'\w\-]+", re.UNICODE) 
     return tokenizer_re.findall(text)
 
 def load_dataset(train_path, dev_path, max_text_length, embedding_dim, tokenizer = tokenizer, dev_ratio = 0.1, pretrained_word_embedding_name = "glove.6B.300d", pretrained_word_embedding_path = None,
-    saved_text_vocab_path = "text_vocab.pkl", saved_label_vocab_path = "label_vocab.pkl",
-    use_gpu = True):
+    saved_text_vocab_path = "text_vocab.pkl", saved_label_vocab_path = "label_vocab.pkl"):
     text_field = data.Field(lower=True, tokenize=tokenizer, fix_length=max_text_length)
     label_field = data.Field(sequential=False)
 
@@ -283,13 +255,7 @@ def load_dataset(train_path, dev_path, max_text_length, embedding_dim, tokenizer
     print('building vocab')
     text_field.build_vocab(train_data, dev_data)
     label_field.build_vocab(train_data, dev_data)
-    
-    '''
-    train_iter, dev_iter = data.Iterator.splits(
-        (train_data, dev_data), batch_sizes=(batch_size, len(dev_data)),
-        repeat=False, device = cpu, shuffle = True, sort_key = sort_key
-    )
-    '''
+
     vectors = None
 
     if pretrained_word_embedding_name == "word2vec":

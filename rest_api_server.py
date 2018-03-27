@@ -63,10 +63,11 @@ logger.info('Completed configuring logger()!')
 text_field = pickle.load(open(param.text_vocab_path, "rb"))
 label_field = pickle.load(open(param.label_vocab_path, "rb"))
 
-@app.route('/predict', methods=['POST'])
+@app.route('/predict', methods=['GET'])
 def prediction():
     try:
-        question = request.get_json()['question']
+        print("hmm")
+        question = request.args.get('question')
         logger.info("Question: " + question)
         x = preprocess_question(question, text_field, transpose = param.use_gpu, use_gpu=param.use_gpu)
         model.eval()
@@ -85,4 +86,4 @@ def prediction():
         return response
 
 if __name__ == '__main__':
-   app.run(debug=True, host='0.0.0.0', port=8999)
+   app.run(host='0.0.0.0')
