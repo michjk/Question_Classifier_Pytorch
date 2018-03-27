@@ -16,7 +16,7 @@ SCOPES = 'https://www.googleapis.com/auth/spreadsheets'
 CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Google Sheets API Python Quickstart'
 
-logging.getLogger('googleapicliet.discovery_cache').setLevel(logging.ERROR
+logging.getLogger('googleapicliet.discovery_cache').setLevel(logging.ERROR)
 
 def get_credentials():
     """Gets valid user credentials from storage.
