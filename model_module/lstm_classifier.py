@@ -7,27 +7,43 @@ import torchqrnn.forget_mult
 from torchqrnn import QRNN
 
 class LSTMClassifier(nn.Module):
-    def __init__(self, embedding_dim, hidden_dim, vocab_size, label_size, batch_size, pretrained_embedding_weight = None, train_embedding_layer = True,num_layers = 1, dropout = 0, use_gpu = True):
-        '''
-        Initialize LSTM based classifier
-        '''
+    '''
+    LSTMClassifier is classification module based on LSTM
+    Args:
+        embedding_dim (int): The size of word vector.
+        vocab_size (int): The number of words/tokens in vocabulary.
+        label_size (int): The number of possible labels.
+        hidden_dim: The number of features in the hidden state h of QRNN
+        pretrained_embedding_weight (torch.Tensor): The pretrained word vectors (optional).
+        train_embedding_layer (bool): Whether to train embedding layer or let embedding layer to be fixed.
+        num_layers (int): The number of layers of QRNN.
+        dropout (float): The probability of dropout in QRNN and dropout layer.
+        use_gpu (bool): Whether to use GPU or not
+    
+    Inputs: x:
+        - x (seq_len, batch, input_size): tensor containing the features of the input sequence.
+    
+    Output: logsoftmax
+        - logsoftmax (batch, label_size) : tensor result of log softmax
+    '''
+    def __init__(self, embedding_dim, hidden_dim, vocab_size, label_size, pretrained_embedding_weight = None, train_embedding_layer = True,num_layers = 1, dropout = 0, use_gpu = True):
         super().__init__()
 
         #initialize properties
         self.hidden_dim = hidden_dim
-        self.batch_size = batch_size
         self.num_layers = num_layers
         self.use_gpu = use_gpu
         
         ## create nn module
         self.word_embeddings = nn.Embedding(vocab_size, embedding_dim)
-        if not (pretrained_embedding_weight is None):
+        if not (pretrained_embedding_weight is None): #use pretrained word vectors
             self.word_embeddings.weight.data = pretrained_embedding_weight
             self.word_embeddings.weight.requires_grad = train_embedding_layer
         self.lstm = nn.LSTM(embedding_dim, hidden_dim, dropout=dropout, num_layers=num_layers)
         self.dropout = nn.Dropout(dropout)
         self.hidden_to_label = nn.Linear(hidden_dim, label_size)
-        self.init_hidden()
+
+        #use gpu
         if use_gpu:
             self.cuda()
         

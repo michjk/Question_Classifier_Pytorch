@@ -12,12 +12,11 @@ def sort_key(ex):
     return len(ex.text)
 
 class ModelRunner:
-    def __init__(self, model_factory, loss_factory, optimizer_factory, epochs, batch_size, learning_logger, transpose = False, use_gpu = True):
+    def __init__(self, model_factory, loss_factory, optimizer_factory, epochs, batch_size, learning_logger, use_gpu = True):
         self.model_factory = model_factory
         self.loss_factory = loss_factory
         self.optimizer_factory = optimizer_factory
         self.epochs = epochs
-        self.transpose = transpose
         self.learning_logger = learning_logger
         self.use_gpu = use_gpu
         self.batch_size = batch_size
@@ -147,8 +146,6 @@ class ModelRunner:
         
         for batch in train_iter:
             sent, label = batch.text, batch.label
-            if self.transpose:
-                sent.data.t_()
             label.data.sub_(1)
             truth_res += list(label.data)
             pred = self.model(sent)
@@ -181,8 +178,6 @@ class ModelRunner:
         
         for batch in eval_iter:
             sent, label = batch.text, batch.label
-            if self.transpose:
-                sent.data.t_()
             label.data.sub_(1)
             truth_res += list(label.data)
             pred = self.model(sent)

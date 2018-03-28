@@ -56,7 +56,7 @@ optimizer_factory = FactoryClass(optim.Adam, optimizer_param_dict)
 #optimizer = optim.RMSprop(update_parameter, lr=parameter.learning_rate, alpha=0.99, eps=1e-8, weight_decay=5e-4)
 
 learning_logger = LearningLogger(label_map, param.result_folder_path, param.saved_model_file_path, param.train_log_folder_path, param.dev_log_folder_path, param.confusion_matrix_folder_path)
-model_runner = ModelRunner(model_factory, loss_factory, optimizer_factory, param.epoch, param.batch_size, learning_logger, param.transpose, param.use_gpu)
+model_runner = ModelRunner(model_factory, loss_factory, optimizer_factory, param.epoch, param.batch_size, learning_logger, param.use_gpu)
 start_time = time.time()
 model_runner.learn_cv(train_data, dev_data, param.n_folds)
 print("Overall time elapsed {} sec".format(time.time() - start_time))
