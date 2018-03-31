@@ -235,11 +235,19 @@ def get_label(label_tensor, label_field):
 
     return label_string
 
-def tokenizer(text): # create a tokenizer function
+def tokenizer(text):
+    '''
+    Tokenizer, includes clear string and lemmatization
+    '''
+
+    #clean string
     text = clean_str(text)
-    #tokenizer from tensorflow.preprocessing library
+
+    #lemmatized
     lemmatized = spacy_nlp(text)
     text = ' '.join([token.lemma_ for token in lemmatized])
+    
+    #tokenizer from tensorflow.preprocessing library
     tokenizer_re = re.compile(r"[A-Z]{2,}(?![a-z])|[A-Z][a-z]+(?=[A-Z])|[\'\w\-]+", re.UNICODE) 
     return tokenizer_re.findall(text)
 
