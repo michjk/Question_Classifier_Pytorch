@@ -6,7 +6,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pandas as pd
-#from pandas_ml import ConfusionMatrix
+from pandas_ml import ConfusionMatrix
 import seaborn as sns
 import numpy as np
 import sklearn
@@ -84,4 +84,8 @@ class LearningLogger:
         heatmap.xaxis.set_ticklabels(heatmap.xaxis.get_ticklabels(), rotation=20, ha='right', fontsize=5)
 
         plt.savefig(self.confusion_matrix_file_path)
+
+        confusion_matrix = ConfusionMatrix(truth_res, pred_res)
+        confusion_matrix.print_stats()
+
 
