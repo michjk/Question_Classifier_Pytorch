@@ -157,7 +157,7 @@ class ModelRunner:
             count += 1
             
             if count % 100 == 0:
-                print('epoch: %d iterations: %d loss :%g' % (i, count*model.batch_size, loss.data[0]))
+                print('epoch: %d iterations: %d loss :%g' % (i, count*label.data.shape[1], loss.data[0]))
             
             loss.backward()
             self.optimizer.step()
