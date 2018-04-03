@@ -147,8 +147,8 @@ class ModelRunner:
         for batch in train_iter:
             sent, label = batch.text, batch.label
             if self.use_gpu:
-                sent.cuda()
-                label.cuda()
+                sent = sent.cuda()
+                label = label.cuda()
             label.data.sub_(1)
             truth_res += list(label.data)
             pred = self.model(sent)
@@ -182,8 +182,8 @@ class ModelRunner:
         for batch in eval_iter:
             sent, label = batch.text, batch.label
             if self.use_gpu:
-                sent.cuda()
-                label.cuda()
+                sent = sent.cuda()
+                label = label.cuda()
             label.data.sub_(1)
             truth_res += list(label.data)
             pred = self.model(sent)
