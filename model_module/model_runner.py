@@ -23,8 +23,8 @@ class ModelRunner:
         
     def get_iterator(self, dataset, batch_size, train=True, shuffle=True, repeat=False, sort_key = sort_key):
         device = -1
-        #if self.use_gpu:
-        #    device = None
+        if self.use_gpu:
+            device = None
         
         if train:
             sort_key = None
@@ -146,9 +146,6 @@ class ModelRunner:
         
         for batch in train_iter:
             sent, label = batch.text, batch.label
-            if self.use_gpu:
-                sent = sent.cuda()
-                label = label.cuda()
             label.data.sub_(1)
             truth_res += list(label.data)
             pred = self.model(sent)
@@ -164,9 +161,6 @@ class ModelRunner:
             
             loss.backward()
             self.optimizer.step()
-
-            del sent
-            del label
         avg_loss /= len(train_iter)
         acc = self.get_accuracy(truth_res,pred_res)
         print('epoch: %d done!\ntrain avg_loss:%g , acc:%g'%(i, avg_loss, acc))
@@ -184,9 +178,6 @@ class ModelRunner:
         
         for batch in eval_iter:
             sent, label = batch.text, batch.label
-            if self.use_gpu:
-                sent = sent.cuda()
-                label = label.cuda()
             label.data.sub_(1)
             truth_res += list(label.data)
             pred = self.model(sent)
@@ -195,8 +186,6 @@ class ModelRunner:
             loss = self.loss_function(pred, label)
             avg_loss += loss.data[0]
 
-            del sent
-            del label
         avg_loss /= len(eval_iter)
         acc = self.get_accuracy(truth_res, pred_res)
         print('dev avg_loss:%g train acc:%g' % (avg_loss, acc))
