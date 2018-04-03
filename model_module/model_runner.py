@@ -164,6 +164,9 @@ class ModelRunner:
             
             loss.backward()
             self.optimizer.step()
+
+            del sent
+            del label
         avg_loss /= len(train_iter)
         acc = self.get_accuracy(truth_res,pred_res)
         print('epoch: %d done!\ntrain avg_loss:%g , acc:%g'%(i, avg_loss, acc))
@@ -191,7 +194,9 @@ class ModelRunner:
             pred_res += [x for x in pred_label]
             loss = self.loss_function(pred, label)
             avg_loss += loss.data[0]
-        
+
+            del sent
+            del label
         avg_loss /= len(eval_iter)
         acc = self.get_accuracy(truth_res, pred_res)
         print('dev avg_loss:%g train acc:%g' % (avg_loss, acc))
