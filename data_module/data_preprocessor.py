@@ -257,6 +257,7 @@ def tokenizer_2(comment):
     comment = re.sub(r"\!+", "!", comment)
     comment = re.sub(r"\,+", ",", comment)
     comment = re.sub(r"\?+", "?", comment)
+    comment = clean_str(comment)
     return [x.text for x in spacy_nlp.tokenizer(comment) if x.text != " "]
 
 def load_dataset(train_path, dev_path, max_text_length, embedding_dim, tokenizer = tokenizer, dev_ratio = 0.1, pretrained_word_embedding_name = "glove.6B.300d", pretrained_word_embedding_path = None,
