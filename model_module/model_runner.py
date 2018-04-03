@@ -23,8 +23,8 @@ class ModelRunner:
         
     def get_iterator(self, dataset, batch_size, train=True, shuffle=True, repeat=False, sort_key = sort_key):
         device = -1
-        if self.use_gpu:
-            device = None
+        #if self.use_gpu:
+        #    device = None
         
         if train:
             sort_key = None
@@ -146,6 +146,9 @@ class ModelRunner:
         
         for batch in train_iter:
             sent, label = batch.text, batch.label
+            if self.use_gpu:
+                sent.cuda()
+                label.cuda()
             label.data.sub_(1)
             truth_res += list(label.data)
             pred = self.model(sent)
@@ -178,6 +181,9 @@ class ModelRunner:
         
         for batch in eval_iter:
             sent, label = batch.text, batch.label
+            if self.use_gpu:
+                sent.cuda()
+                label.cuda()
             label.data.sub_(1)
             truth_res += list(label.data)
             pred = self.model(sent)
