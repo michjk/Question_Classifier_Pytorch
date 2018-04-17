@@ -3,9 +3,6 @@ import torch.nn as nn
 import torch.autograd as autograd
 import torch.nn.functional as F
 
-import torchqrnn.forget_mult
-from torchqrnn import QRNN
-
 class LSTMClassifier(nn.Module):
     '''
     LSTMClassifier is classification module based on LSTM
