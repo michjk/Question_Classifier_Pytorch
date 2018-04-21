@@ -64,19 +64,8 @@ class LearningLogger:
 
     def save_confusion_matrix(self, truth_res, pred_res):
         
-        #truth_res = [self.label_map[i+1] for i in truth_res]
-        #pred_res = [self.label_map[i+1] for i in pred_res]
-        '''
-        print(len(truth_res))
-        print(len(pred_res))
-        confusion_matrix = ConfusionMatrix(truth_res, pred_res)
-        plt.figure(dpi=200, figsize=(10, 7))
-        confusion_matrix.plot()
-        plt.savefig(self.confusion_matrix_file_path)
-        '''
         s = sklearn.metrics.confusion_matrix(truth_res, pred_res)
-        list_label = self.label_map[1:]
-        df_cm = pd.DataFrame(data = s, columns=list_label, index=list_label)
+        df_cm = pd.DataFrame(data = s, columns=self.label_map, index=self.label_map)
         plt.figure(dpi=100)
         
         heatmap = sns.heatmap(df_cm, annot=True, fmt='d')

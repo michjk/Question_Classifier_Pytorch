@@ -146,7 +146,6 @@ class ModelRunner:
         
         for batch in train_iter:
             sent, label = batch.text, batch.label
-            label.data.sub_(1)
             truth_res += list(label.data)
             pred = self.model(sent)
             pred_label = pred.data.max(1)[1]
@@ -178,7 +177,6 @@ class ModelRunner:
         
         for batch in eval_iter:
             sent, label = batch.text, batch.label
-            label.data.sub_(1)
             truth_res += list(label.data)
             pred = self.model(sent)
             pred_label = pred.data.max(1)[1]

@@ -82,10 +82,11 @@ def tokenizer(text):
     tokenizer_re = re.compile(r"[A-Z]{2,}(?![a-z])|[A-Z][a-z]+(?=[A-Z])|[\'\w\-]+", re.UNICODE) 
     return tokenizer_re.findall(text)
 
-def load_dataset(train_path, dev_path, max_text_length, embedding_dim, tokenizer = tokenizer, dev_ratio = 0.1, pretrained_word_embedding_name = "glove.6B.300d", pretrained_word_embedding_path = None,
-    saved_text_vocab_path = "text_vocab.pkl", saved_label_vocab_path = "label_vocab.pkl"):
+def load_dataset(train_path, dev_path, max_text_length, embedding_dim, tokenizer = tokenizer, pretrained_word_embedding_name = "glove.6B.300d", pretrained_word_embedding_path = None,
+    saved_text_vocab_file_path = "text_vocab.pkl", saved_label_vocab_file_path = "label_vocab.pkl"):
+    
     text_field = data.Field(lower=True, tokenize=tokenizer, fix_length=max_text_length)
-    label_field = data.Field(sequential=False)
+    label_field = data.LabelField()
 
     print('loading data')
     train_data = data.TabularDataset(path=train_path, format='csv', skip_header=True, fields=[("text", text_field), ('label', label_field)])
@@ -105,13 +106,12 @@ def load_dataset(train_path, dev_path, max_text_length, embedding_dim, tokenizer
         text_field.vocab.load_vectors(pretrained_word_embedding_name)
         vectors = text_field.vocab.vectors
     
-    pickle.dump(text_field, open(saved_text_vocab_path, 'wb'))
-    pickle.dump(label_field, open(saved_label_vocab_path, 'wb'))
+    pickle.dump(text_field, open(saved_text_vocab_file_path, 'wb'))
+    pickle.dump(label_field, open(saved_label_vocab_file_path, 'wb'))
 
     vocab_size = len(text_field.vocab)
     print("vocab size ", vocab_size)
-    #from zero
-    label_size = len(label_field.vocab) - 1
+    label_size = len(label_field.vocab)
 
     return train_data, dev_data, vocab_size, label_size, label_field.vocab.itos, vectors
 
