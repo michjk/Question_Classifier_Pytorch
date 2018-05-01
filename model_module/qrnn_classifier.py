@@ -45,7 +45,7 @@ class QRNNClassifier(nn.Module):
         if self.use_pretrained_word_embedding:
             self.word_embeddings.weight.data = pretrained_embedding_weight
             self.word_embeddings.weight.requires_grad = train_embedding_layer
-        self.qrnn = QRNN(embedding_dim, hidden_dim, dropout=dropout, zoneout=zoneout, window = window, save_prev_x = save_prev_x, num_layers=num_layers)
+        self.qrnn = QRNN(embedding_dim, hidden_dim, dropout=dropout, zoneout=zoneout, window = window, save_prev_x = save_prev_x, num_layers=num_layers, use_cuda = use_gpu)
         self.dropout = nn.Dropout(dropout)
         self.hidden_to_label = nn.Linear(hidden_dim, label_size)
         
