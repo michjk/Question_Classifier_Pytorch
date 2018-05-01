@@ -19,6 +19,8 @@
     "use_git": true,
     "result_folder_path": "runs",
     "saved_model_file_path": "best_model/faq_best_model.model",
+    "saved_text_pipeline_file_path": "preprocessing_pipeline/text_pipeline.pkl",
+    "saved_label_pipeline_file_path": "preprocessing_pipeline/label_pipeline.pkl",
     "train_log_folder_path": "summaries/train",
     "dev_log_folder_path": "summaries/dev",
     "confusion_matrix_folder_path": "summaries/confusion_matrix",
