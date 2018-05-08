@@ -152,7 +152,7 @@ class ModelRunner:
             pred_res += [x for x in pred_label]
             self.model.zero_grad()
             loss = self.loss_function(pred, label)
-            avg_loss += loss.data[0]
+            avg_loss += float(loss.data[0])
             count += 1
             
             if count % 100 == 0:
@@ -182,7 +182,7 @@ class ModelRunner:
             pred_label = pred.data.max(1)[1]
             pred_res += [x for x in pred_label]
             loss = self.loss_function(pred, label)
-            avg_loss += loss.data[0]
+            avg_loss += float(loss.data[0])
         
         avg_loss /= len(eval_iter)
         acc = self.get_accuracy(truth_res, pred_res)
