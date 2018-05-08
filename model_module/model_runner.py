@@ -146,10 +146,10 @@ class ModelRunner:
         
         for batch in train_iter:
             sent, label = batch.text, batch.label
-            truth_res += list(label.data)
+            truth_res += [int(x) for x in label.data]
             pred = self.model(sent)
             pred_label = pred.data.max(1)[1]
-            pred_res += [x for x in pred_label]
+            pred_res += [int(x) for x in pred_label]
             self.model.zero_grad()
             loss = self.loss_function(pred, label)
             avg_loss += float(loss.data[0])
@@ -177,10 +177,10 @@ class ModelRunner:
         
         for batch in eval_iter:
             sent, label = batch.text, batch.label
-            truth_res += list(label.data)
+            truth_res += [int(x) for x in label.data]
             pred = self.model(sent)
             pred_label = pred.data.max(1)[1]
-            pred_res += [x for x in pred_label]
+            pred_res += [int(x) for x in pred_label]
             loss = self.loss_function(pred, label)
             avg_loss += float(loss.data[0])
         
