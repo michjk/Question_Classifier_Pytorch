@@ -42,7 +42,7 @@ class QuestionWrapper(data.Dataset):
 
         super().__init__(examples, fields, **kwargs)
 
-def preprocess_question(question, text_field, transpose = False, use_gpu = False):
+def preprocess_question(question, text_field, use_gpu = False):
     device = -1
     if use_gpu:
         device = None
@@ -54,15 +54,13 @@ def preprocess_question(question, text_field, transpose = False, use_gpu = False
 
     for batch in question_iter:
         text = batch.text
-        if transpose:
-            text.data.t_()
 
         return text
 
 def get_label(label_tensor, label_field):
     pred_index = label_tensor.data.max(1)[1]
     pred_index = pred_index.cpu().numpy()[0]
-    label_string = label_field.vocab.itos[pred_index+1]
+    label_string = label_field.vocab.itos[pred_index]
 
     return label_string
 

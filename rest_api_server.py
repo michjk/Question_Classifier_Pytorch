@@ -60,13 +60,12 @@ logger.addHandler(logger_handler_debug)
 logger.addHandler(logger_handler_error)
 logger.info('Completed configuring logger()!')
 
-text_field = pickle.load(open(param.text_vocab_path, "rb"))
-label_field = pickle.load(open(param.label_vocab_path, "rb"))
+text_field = pickle.load(open(param.saved_text_pipeline_file_path, "rb"))
+label_field = pickle.load(open(param.saved_label_pipeline_file_path, "rb"))
 
 @app.route('/predict', methods=['GET'])
 def prediction():
     try:
-        print("hmm")
         question = request.args.get('question')
         logger.info("Question: " + question)
         x = preprocess_question(question, text_field, transpose = param.use_gpu, use_gpu=param.use_gpu)
