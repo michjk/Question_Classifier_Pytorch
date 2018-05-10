@@ -3,6 +3,6 @@
     "saved_model_file_path": "runs/cnn_demo_commited_at_Tue_08_May_2018_11_10/best_model/faq_best_model.model",
     "debug_log_file_path": "rest_api_debug.log",
     "error_log_file_path": "rest_api_error.log",
-    "saved_text_pipeline_file_path": "runs/cnn_demo_commited_at_Tue_08_May_2018_11_10/preprocessing_pipeline/text_vocab.pkl", 
-    "saved_label_pipeline_file_path": "runs/cnn_demo_commited_at_Tue_08_May_2018_11_10/preprocessing_pipeline/label_vocab.pkl"
+    "saved_text_pipeline_file_path": "runs/cnn_demo_commited_at_Tue_08_May_2018_11_10/preprocessing_pipeline/text_pipeline.pkl", 
+    "saved_label_pipeline_file_path": "runs/cnn_demo_commited_at_Tue_08_May_2018_11_10/preprocessing_pipeline/label_pipeline.pkl"
 }
