@@ -68,7 +68,7 @@ def prediction():
     try:
         question = request.args.get('question')
         logger.info("Question: " + question)
-        x = preprocess_question(question, text_field, transpose = param.use_gpu, use_gpu=param.use_gpu)
+        x = preprocess_question(question, text_field, use_gpu=param.use_gpu)
         model.eval()
         t = time.time()
         y = model(x)
