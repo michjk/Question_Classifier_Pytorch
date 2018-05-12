@@ -23,7 +23,7 @@ class QRNNClassifier(nn.Module):
         zoneout (float): Whether to apply zoneout of QRNN (i.e. failing to update elements in the hidden state) to the hidden state updates. Default: 0.
         use_gpu (bool): Whether to use GPU or not
     
-    Inputs: x:
+    Inputs: x
         - x (seq_len, batch, input_size): tensor containing the features of the input sequence.
     
     Output: logsoftmax

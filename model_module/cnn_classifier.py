@@ -19,7 +19,7 @@ class  CNNClassifier(nn.Module):
         use_gpu (bool): Whether to use GPU or not
         layers: List of preconstructed QRNN layers to use for the QRNN module (optional).
 
-    Inputs: x:
+    Inputs: x
         - x (seq_len, batch, input_size): tensor containing the features of the input sequence.
     Output: logsoftmax
         - logsoftmax (batch, label_size) : tensor result of log softmax

@@ -18,7 +18,7 @@ import datetime
 
 from model_module.model_runner import ModelRunner
 
-from utils import load_parameter_from_json, filter_dotdict_class_propoperty, FactoryClass
+from utils import load_training_parameter_from_json, filter_dotdict_class_propoperty, FactoryClass
 
 from data_module.data_writer import LearningWriter, PreprocessingPipelineWriter
 
@@ -33,7 +33,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--path", help="path parameter json file")
 param_json_path = parser.parse_args().path
 
-param = load_parameter_from_json(param_json_path)
+param = load_training_parameter_from_json(param_json_path)
 cnn_parameter = filter_dotdict_class_propoperty(param, CNNClassifier)
 
 preprocessing_pipeline_writer = PreprocessingPipelineWriter(param.result_folder_path, param.saved_text_pipeline_file_path, param.saved_label_pipeline_file_path)
