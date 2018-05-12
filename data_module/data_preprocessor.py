@@ -6,7 +6,6 @@ import json
 from torchtext import data
 import codecs
 from sklearn.model_selection import KFold
-from utils import dotdict
 import torchwordemb
 import dill as pickle
 import spacy
