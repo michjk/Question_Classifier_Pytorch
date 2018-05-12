@@ -61,10 +61,11 @@ class LSTMClassifier(nn.Module):
                         autograd.Variable(c))
         
     def forward(self, sentence):
+        #get batch size and init hidden
         self.batch_size = sentence.data.shape[1]
         self.init_hidden()
         
-        embeds = self.word_embeddings(sentence)
+        embeds = self.word_embeddings(sentence) # (N,W,D)
         x = embeds.view(len(sentence), self.batch_size, -1)
         out, self.hidden = self.lstm(x, self.hidden)
         out = self.dropout(out)
