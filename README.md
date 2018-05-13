@@ -22,12 +22,15 @@ source virtualenv_name/bin/activate
 ```
 To install python depencies library for this appliaction:
 ```
-pip install cupy-cuda90 (or cupy-cuda80 for installing QRNN)
-pip install pynvrtc git+https://github.com/salesforce/pytorch-qrnn //(for installing QRNN)
+pip install http://download.pytorch.org/whl/cu90/torch-0.4.0-cp35-cp35m-linux_x86_64.whl # for CUDA 9 or pip install torch for CUDA 8 
+pip install cupy-cuda90 # or cupy-cuda80
+pip install pynvrtc git+https://github.com/salesforce/pytorch-qrnn # for installing QRNN
+pip install spacy
 python -m spacy download en #for downloading English model for spaCy tokenizer
+pip install cffi # probably not needed by just try
 pip install -r requirements.txt
 ```
-If it fails, please look requirements.txt and install one by one.
+If it fails, please look at requirements.txt and install one by one.
 
 ## Dataset
 The dataset should be seperated into training file and test file in CSV format.
@@ -38,7 +41,8 @@ pandas.to_csv('file_name', index=False)
 ```
 
 ## Project Structure
-This project is basically my own framework for developing question classification. The framework suggest user to load module from 3 different folder.
+This project is basically my own framework for developing question classification. It is mostly built with Pytorch and also torchtext for Pytorch specific NLP preprocessor.
+The framework suggest user to load module from 3 different folder.
 1. data_module: The folder consist of function for loading & preprocessing dataset and writing results.
 2. model_module: The folder consist of several classification models and a module for running training.
 
@@ -78,7 +82,7 @@ CNN
 ```
 python train_cnn.py --path train_cnn_parameter.json
 ```
-The result are saved under result_folder_path. For accuracy & loss plot, use tensorboard.
+The result are saved under result_folder_path. For accuracy & loss plot, use tensorboard to visualize them (will be explained).
 
 ## k-fold Cross Validation of model
 QRNN
@@ -95,7 +99,7 @@ CNN
 ```
 python train_cv_cnn.py --path train_cnn_parameter.json
 ```
-Note: currently the validation result are printed to console 
+Note: currently the cross validation result are printed to console, not saved 
 
 ## JSON file for training model
 The JSON file are already prepared with appropriate setting. You can have parameter name different from example, but it is best to follow the example.Most of the setting are for model hyperparameter, loss function parameter, and optimizer parameter that has same parameter name as the model, loss function, and optimizer itselves.
@@ -119,7 +123,7 @@ Besides that, another parameter that important:
 
 Please look at the json file and try to run training first to understand more
 
-## View test accuracy and loss with tensorboard
+## View train & test accuracy and loss plot with tensorboard
 Please run
 ```
 tensorboard --logdir=[result_folder_path] --host 0.0.0.0
