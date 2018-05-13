@@ -28,8 +28,10 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--path", help="path parameter json file")
 param_json_path = parser.parse_args().path
 
+# load parameter
 param = load_rest_api_parameter_from_json(param_json_path)
 
+# load model
 model = None
 if param.use_gpu:
     model = torch.load(param.saved_model_file_path)
@@ -60,6 +62,7 @@ logger.addHandler(logger_handler_debug)
 logger.addHandler(logger_handler_error)
 logger.info('Completed configuring logger()!')
 
+# load data.Field
 text_field = pickle.load(open(param.saved_text_pipeline_file_path, "rb"))
 label_field = pickle.load(open(param.saved_label_pipeline_file_path, "rb"))
 

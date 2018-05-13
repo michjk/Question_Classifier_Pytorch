@@ -6,7 +6,7 @@ import logging
 import argparse
 import traceback
 
-from google_sheet_api import send_log
+#from google_sheet_api import send_log
 
 parser = argparse.ArgumentParser(description="This is for establishing telegram bot")
 parser.add_argument('-t', '--token', help="telegram token", required=True)
@@ -14,7 +14,6 @@ parser.add_argument('--ip', help="IP address", required = True)
 
 args = parser.parse_args()
 
-#'543323547:AAHAEgEUZYRXKnMg-lUEcwv0TLxDXJ2Rib8'
 TOKEN = args.token
 URL = args.ip
 
@@ -64,7 +63,7 @@ def feedback(bot, update):
         logger.debug("Satisfied: " + query.data)
         if (query.data == 'yes'):
             cache_data[query.message.chat_id].append("none")
-            send_log(cache_data[query.message.chat_id])
+            #send_log(cache_data[query.message.chat_id])
             query.message.reply_text("Thanks for responding")
             return
         keyboard = [
@@ -89,7 +88,7 @@ def recommended(bot, update):
     logger.debug("Recommended: " + query.data)
     
     cache_data[query.message.chat_id].append(query.data)
-    send_log(cache_data[query.message.chat_id])
+    #send_log(cache_data[query.message.chat_id])
 
     query.message.reply_text("Thanks for responding")
     return

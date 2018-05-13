@@ -15,6 +15,7 @@ import logging
 SCOPES = 'https://www.googleapis.com/auth/spreadsheets'
 CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Google Sheets API Python Quickstart'
+spreadsheetId = 'Please insert id here'
 
 logging.getLogger('googleapicliet.discovery_cache').setLevel(logging.ERROR)
 
@@ -60,7 +61,6 @@ def send_log(data):
     service = discovery.build('sheets', 'v4', http=http,
                               discoveryServiceUrl=discoveryUrl)
 
-    spreadsheetId = '1Dcex6JWR3n_8Hu4y2Dfv6OZ5c_gphIpwdVDhMCKiyEY'
     rangeName = 'Sheet1!A:C'
     body = {
         'values': [
@@ -74,7 +74,7 @@ def send_log(data):
     if not values:
         print('No data found.')
     else:
-        print('Name, Major:')
+        print('Print Data')
         for row in values:
             # Print columns A and E, which correspond to indices 0 and 4.
             print('%s, %s' % (row[0], row[1]))
