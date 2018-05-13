@@ -131,7 +131,7 @@ def load_dataset(train_path, dev_path, max_text_length, preprocessing_pipeline_w
             - test_data (data.Dataset): test dataset
             - vocab_size (int): vocabulary size
             - label_size (int): size of possible label
-            - label_vocab (dict): map from topic label string to index number
+            - label_vocab (dict): map from topic index number to topic label string
             - vectors : word embedding vectors
     '''
 
