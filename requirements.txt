@@ -108,6 +108,6 @@ urllib3==1.22
 uWSGI==2.0.17
 uwsgitop==0.10
 wcwidth==0.1.7
-Werkzeug==0.14.1
+Werkzeug==0.15.3
 widgetsnbextension==3.1.4
 wrapt==1.10.11
