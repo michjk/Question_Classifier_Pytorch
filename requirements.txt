@@ -90,7 +90,7 @@ tensorboard==1.7.0
 tensorboard-logger==0.0.4
 tensorboardX==1.2
 tensorflow==1.7.0
-tensorflow-gpu==1.4.1
+tensorflow-gpu==1.15.2
 tensorflow-tensorboard==0.4.0rc3
 termcolor==1.1.0
 terminado==0.8.1
