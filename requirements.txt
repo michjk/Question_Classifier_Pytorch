@@ -23,7 +23,7 @@ GitPython==2.1.8
 google-api-python-client==1.6.5
 grpcio==1.10.0
 html5lib==0.9999999
-httplib2==0.18.0
+httplib2==0.19.0
 idna==2.6
 ipykernel==4.8.2
 ipython==6.2.1
