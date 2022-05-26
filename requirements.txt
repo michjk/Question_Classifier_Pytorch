@@ -104,7 +104,7 @@ tqdm==4.23.0
 traitlets==4.3.2
 ujson==5.2.0
 uritemplate==3.0.0
-urllib3==1.22
+urllib3==1.26.5
 uWSGI==2.0.17
 uwsgitop==0.10
 wcwidth==0.1.7
