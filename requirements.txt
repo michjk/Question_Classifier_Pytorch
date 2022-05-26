@@ -14,7 +14,7 @@ entrypoints==0.2.3
 enum34==1.1.6
 fastrlock==0.3
 filelock==3.0.4
-Flask==0.12.2
+Flask==1.0
 ftfy==4.4.3
 future==0.16.0
 gast==0.2.0
