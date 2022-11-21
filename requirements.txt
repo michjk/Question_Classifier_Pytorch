@@ -89,7 +89,7 @@ smmap2==2.0.3
 tensorboard==1.7.0
 tensorboard-logger==0.0.4
 tensorboardX==1.2
-tensorflow==1.7.0
+tensorflow==2.9.3
 tensorflow-gpu==1.4.1
 tensorflow-tensorboard==0.4.0rc3
 termcolor==1.1.0
